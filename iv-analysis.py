@@ -30,7 +30,7 @@ filenames = glob('data/iv/*.abf')
 resultsfilename = 'results-' + \
                   datetime.datetime.utcnow().replace(microsecond=0) \
                           .isoformat('-').replace(':','-') + '.txt'
-print "Writing results to", resultsfilename
+print("Writing results to", resultsfilename)
 resultsfile = open(resultsfilename, 'w')
 resultsfile.write('Filename\tsegment\tt_min(s)\tI_min(pA)\n')
 
