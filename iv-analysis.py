@@ -9,6 +9,7 @@ import matplotlib as mpl
 from math import floor
 import quantities as pq
 from glob import glob
+import datetime
 
 window = ones(50)/50.0
 cmap = cm.get_cmap('winter')
@@ -20,7 +21,11 @@ tAnalyseFrom = 0.2562
 tAnalyseTo   = 0.263
 
 filenames = glob('data/iv/*.abf')
-resultsfile = open('results.txt', 'w')
+resultsfilename = 'results-' + \
+                  datetime.datetime.utcnow().replace(microsecond=0) \
+                          .isoformat('-').replace(':','-') + '.txt'
+print "Writing results to", resultsfilename
+resultsfile = open(resultsfilename, 'w')
 resultsfile.write('Filename\tsegment\tt_min(s)\tI_min(pA)\n')
 
 for filename in filenames:
