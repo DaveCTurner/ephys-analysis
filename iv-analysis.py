@@ -6,7 +6,7 @@ from numpy import mean, std, arange, convolve, ones, amin
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib as mpl
-from math import floor
+from math import floor, sqrt
 import quantities as pq
 from glob import glob
 import datetime
@@ -33,12 +33,12 @@ rundate = datetime.datetime.utcnow().replace(microsecond=0) \
 pertracefilename = rundate + '-results-per-trace.txt'
 print ("Writing per-trace results to", pertracefilename)
 pertracefile = open(pertracefilename, 'w')
-pertracefile.write('Filename\tsegment\tt_min(s)\tI_min(pA)\t-ve peak(pA)\t+ve peak(pA)\n')
+pertracefile.write('Filename\tsegment\tt_min(s)\tI_min(pA)\t-ve peak(pA)\t"+ve peak(pA)"\n')
 
 percellfilename = rundate + '-results-per-cell.txt'
 print ("Writing per-cell results to", percellfilename)
 percellfile = open(percellfilename, 'w')
-percellfile.write('Filename\tBest peak (pA)\tMean noise (pA)\n')
+percellfile.write('Filename\tBest peak (pA)\tMean RMS noise (pA)\tMean P2P noise\n')
 
 for filename in filenames:
     if (filename.find(' IV\\') == -1):
@@ -70,8 +70,9 @@ for filename in filenames:
     colormap = cm.ScalarMappable(norm=norm, cmap=cmap)
 
     # Per-cell statistics
-    perCellMinPeak    = 0
-    perCellTotalNoise = 0
+    perCellMinPeak       = 0
+    perCellTotalP2PNoise = 0
+    perCellTotalRMSNoise = 0
     
     for seg in blocks[0].segments:
         segmentIndex = segmentIndex + 1
@@ -89,8 +90,12 @@ for filename in filenames:
         offsetted = signal[tStart / sample_time_sec : tEnd / sample_time_sec] - baseline
         
         # Find the +ve and -ve peak noise values
-        peakNoiseNeg = min(offsetted[:tBaselineLength / sample_time_sec])
-        peakNoisePos = max(offsetted[:tBaselineLength / sample_time_sec])
+        quiescentSignal = offsetted[:tBaselineLength / sample_time_sec]
+        peakNoiseNeg = min(quiescentSignal)
+        peakNoisePos = max(quiescentSignal)
+        meanSquareNoise = mean(quiescentSignal**2)
+        meanSquareNoise.units = 'pA**2'
+        rmsNoise = sqrt(meanSquareNoise)
 
         # Draw the exact signal
         line = plt.plot(arange(tStart + tBaselineLength, tAnalyseTo, sample_time_sec),
@@ -127,11 +132,13 @@ for filename in filenames:
         if (minCurrent.item() < perCellMinPeak):
           perCellMinPeak = minCurrent.item()
         
-        perCellTotalNoise += peakNoisePos.item() - peakNoiseNeg.item()
+        perCellTotalP2PNoise += peakNoisePos.item() - peakNoiseNeg.item()
+        perCellTotalRMSNoise += rmsNoise
         
     percellfile.write(sampleName              + '\t'
       + str(perCellMinPeak)                   + '\t'
-      + str(perCellTotalNoise / segmentCount) + '\n')
+      + str(perCellTotalRMSNoise / segmentCount) + '\t'
+      + str(perCellTotalP2PNoise / segmentCount) + '\n')
 
     # Shade the part of the graph where the peak was sought
     plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
