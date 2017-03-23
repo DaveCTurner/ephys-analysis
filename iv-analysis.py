@@ -21,38 +21,58 @@ cmap = cm.get_cmap('winter')
 tStart          = 0.245  # Start the graph and start estimating the baseline
 tBaselineLength = 0.01   # Estimate the baseline for this long
 tEnd            = 0.268  # End the graph
-tAnalyseFrom    = 0.2562 # Look for peaks after this time
+tAnalyseFrom    = 0.2557 # Look for peaks after this time
 tAnalyseTo      = 0.263  # Look for peaks before this time
 
-filenames = glob('data/iv/*.abf')
+filenames = glob('C:\\Users\\DavidTurner\\Documents\\Dropbox\\Tess and Dave\\Ephys data\\Python files\\**\\*.abf', recursive=True)
 
 # Open a results file with the date in the filename
-resultsfilename = 'results-' + \
-                  datetime.datetime.utcnow().replace(microsecond=0) \
-                          .isoformat('-').replace(':','-') + '.txt'
-print ("Writing results to", resultsfilename)
-resultsfile = open(resultsfilename, 'w')
-resultsfile.write('Filename\tsegment\tt_min(s)\tI_min(pA)\n')
+rundate = datetime.datetime.utcnow().replace(microsecond=0) \
+                          .isoformat('-').replace(':','-')
+                          
+pertracefilename = rundate + '-results-per-trace.txt'
+print ("Writing per-trace results to", pertracefilename)
+pertracefile = open(pertracefilename, 'w')
+pertracefile.write('Filename\tsegment\tt_min(s)\tI_min(pA)\t-ve peak(pA)\t+ve peak(pA)\n')
+
+percellfilename = rundate + '-results-per-cell.txt'
+print ("Writing per-cell results to", percellfilename)
+percellfile = open(percellfilename, 'w')
+percellfile.write('Filename\tBest peak (pA)\tMean noise (pA)\n')
 
 for filename in filenames:
-    print ("Processing", filename)
+    if (filename.find(' IV\\') == -1):
+      continue
+
+    sampleName = filename[77:]
+      
+    print ("Processing", sampleName)
     
     # Read the file into 'blocks'
     reader = AxonIO(filename=filename)
     blocks = reader.read()
 
+    # y axis -670 to +100
+    # cut down x axis
+    
     # Create a new graph
-    fig = plt.figure(figsize=(10,5),dpi=80)
-    plt.title(filename)
+    fig = plt.figure(figsize=(20,10),dpi=80)
+    plt.title(sampleName)
     plt.xlabel('Time (s)')
     plt.ylabel('I (pA)')
-
+    axes = plt.gca()
+    axes.set_ylim([-670,100])
+    
     # Count how many segments there are and set up the colormap accordingly
     segmentIndex = 0
     segmentCount = len(blocks[0].segments)
     norm = mpl.colors.Normalize(vmin=1, vmax=segmentCount)
     colormap = cm.ScalarMappable(norm=norm, cmap=cmap)
 
+    # Per-cell statistics
+    perCellMinPeak    = 0
+    perCellTotalNoise = 0
+    
     for seg in blocks[0].segments:
         segmentIndex = segmentIndex + 1
 
@@ -67,26 +87,21 @@ for filename in filenames:
 
         # Only take the signal from tStart to tEnd and take out the estimated baseline
         offsetted = signal[tStart / sample_time_sec : tEnd / sample_time_sec] - baseline
+        
+        # Find the +ve and -ve peak noise values
+        peakNoiseNeg = min(offsetted[:tBaselineLength / sample_time_sec])
+        peakNoisePos = max(offsetted[:tBaselineLength / sample_time_sec])
 
-        # Apply the moving average
-        smoothed = convolve(offsetted, window, 'same')
-
-        # Draw the exact signal faintly (alpha = 0.08)
-        line = plt.plot(arange(tStart, tEnd, sample_time_sec),
-                 offsetted, linewidth=0.5, alpha=0.08)
-        color = colormap.to_rgba(segmentCount - segmentIndex)
-        plt.setp(line, color=color)
-
-        # Draw the smoothed signal
-        line = plt.plot(arange(tStart, tEnd, sample_time_sec),
-                 smoothed, linewidth=0.5, alpha=0.48)
+        # Draw the exact signal
+        line = plt.plot(arange(tStart + tBaselineLength, tAnalyseTo, sample_time_sec),
+                 offsetted[tBaselineLength / sample_time_sec : (tAnalyseTo - tStart) / sample_time_sec], linewidth=0.5, alpha=0.48)
         color = colormap.to_rgba(segmentCount - segmentIndex)
         plt.setp(line, color=color)
 
         # Just take the bit of the smoothed signal that needs searching for the peak
-        toAnalyse = smoothed [ (tAnalyseFrom - tStart) / sample_time_sec
-                             : (tAnalyseTo   - tStart) / sample_time_sec
-                             ]
+        toAnalyse = offsetted [ (tAnalyseFrom - tStart) / sample_time_sec
+                              : (tAnalyseTo   - tStart) / sample_time_sec
+                              ]
 
         # Find the peak index (number of samples), current and time
         minIndex = toAnalyse.argmin()
@@ -96,21 +111,35 @@ for filename in filenames:
         # Draw a mark at the peak
         mark = plt.plot(minTime, minCurrent, '+')
         plt.setp(mark, color=color)
+        
+        minCurrent.units = 'pA'
+        peakNoiseNeg.units = 'pA'
+        peakNoisePos.units = 'pA'
 
         # Write the position of the peak to the results file
-        resultsfile.write(filename          + '\t'
-                        + str(segmentIndex) + '\t'
-                        + str(minTime)      + '\t'
-                        + str(minCurrent)   + '\n')
-
-    # Shade the part of the graph where the baseline was calculated
-    plt.axvspan(tStart, tStart + tBaselineLength, facecolor='#808080', alpha=0.5)
+        pertracefile.write(sampleName                 + '\t'
+                        + str(segmentIndex)          + '\t'
+                        + str(minTime)               + '\t'
+                        + str(minCurrent.item())     + '\t'
+                        + str(peakNoiseNeg.item())   + '\t'
+                        + str(peakNoisePos.item())   + '\n')
+                        
+        if (minCurrent.item() < perCellMinPeak):
+          perCellMinPeak = minCurrent.item()
+        
+        perCellTotalNoise += peakNoisePos.item() - peakNoiseNeg.item()
+        
+    percellfile.write(sampleName              + '\t'
+      + str(perCellMinPeak)                   + '\t'
+      + str(perCellTotalNoise / segmentCount) + '\n')
 
     # Shade the part of the graph where the peak was sought
     plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
 
     # Save the graph next to the data file
     plt.grid()
-    plt.savefig(filename + '.png')
-
-resultsfile.close()
+    plt.savefig(filename + '-iv-graph.png')
+    plt.close()
+    
+pertracefile.close()
+percellfile.close()
