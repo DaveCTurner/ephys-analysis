@@ -10,6 +10,13 @@ from math import floor, sqrt
 import quantities as pq
 from glob import glob
 import datetime
+import argparse
+
+# Handle command-line arguments
+
+parser = argparse.ArgumentParser(description='IV analysis')
+parser.add_argument('path')
+args = parser.parse_args()
 
 # Define the moving average window: '0.02' repeated 50 times.
 window = ones(50)/50.0
@@ -24,7 +31,7 @@ tEnd            = 0.268  # End the graph
 tAnalyseFrom    = 0.2557 # Look for peaks after this time
 tAnalyseTo      = 0.263  # Look for peaks before this time
 
-filenames = glob('C:\\Users\\DavidTurner\\Documents\\Dropbox\\Tess and Dave\\Ephys data\\Python files\\**\\*.abf', recursive=True)
+filenames = glob(args.path + '\\**\\*.abf', recursive=True)
 
 # Open a results file with the date in the filename
 rundate = datetime.datetime.utcnow().replace(microsecond=0) \
@@ -44,7 +51,7 @@ for filename in filenames:
     if (filename.find(' IV\\') == -1):
       continue
 
-    sampleName = filename[77:]
+    sampleName = filename[len(args.path):]
       
     print ("Processing", sampleName)
     
