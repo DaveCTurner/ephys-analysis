@@ -59,9 +59,6 @@ for filename in filenames:
     reader = AxonIO(filename=filename)
     blocks = reader.read()
 
-    # y axis -670 to +100
-    # cut down x axis
-    
     # Create a new graph
     fig = plt.figure(figsize=(20,10),dpi=80)
     plt.title(sampleName)
