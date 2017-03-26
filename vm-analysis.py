@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from neo.io import AxonIO
-from numpy import mean, std, arange, convolve, ones, amin
+from numpy import mean, std, arange, convolve, ones, amin, argmin
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib as mpl
@@ -10,46 +10,84 @@ from math import floor, sqrt
 import quantities as pq
 from glob import glob
 import datetime
-import scipy
-import cmath
-from scipy.signal import butter, lfilter
+import argparse
+import csv
+from os.path import basename
 
-# Define colour map: 'winter' is kinda green to kinda blue.
-cmap = cm.get_cmap('winter')
+# Handle command-line arguments
+parser = argparse.ArgumentParser(description='IV analysis')
+parser.add_argument('path')
+args = parser.parse_args()
 
-datasets = glob('data\\vm\\*')
+# Load cell-details.txt
+cellDetailsByCell = {}
+with open('cell-details.txt') as cellDetailsFile:
+  cellDetailsReader = csv.DictReader(cellDetailsFile, delimiter='\t')
+  for cellDetailsRow in cellDetailsReader:
+    if (cellDetailsRow['path'] != ''):
+      cellDetailsByCell[cellDetailsRow['filename']] = \
+        { 'filename':               cellDetailsRow['filename']                      \
+        , 'path':                   cellDetailsRow['path']                          \
+        , 'cell_line':              cellDetailsRow['cell_line']                     \
+        , 'cell_source':            cellDetailsRow['cell_source']                   \
+        , 'protocol':               cellDetailsRow['protocol']                      \
+        , 'freshness':              cellDetailsRow['freshness']                     \
+        , 'classification':         cellDetailsRow['classification']                \
+        , 'date':                   cellDetailsRow['date']                          \
+        , 'notes':                  cellDetailsRow['notes']                         \
+        }
 
-all_signals = {}
+filenames = glob(args.path + '\\**\\*.abf', recursive=True)
+
+conditions = {}
+
+for filename in filenames:
+  cellDetails = cellDetailsByCell.get(basename(filename), None)
+  if (cellDetails == None):
+    print("No cell details for", filename)
+    continue
+
+  if (cellDetails['protocol'] != 'Vm'):
+    continue
+
+  if (cellDetails['classification'] == 'DISCARD'):
+    continue
+
+  condition = " ".join([cellDetails['cell_source'], cellDetails['cell_line'], cellDetails['freshness']])
+
+  conditionData = conditions.get(condition, None)
+  if (conditionData == None):
+    conditionData = {'files': []}
+    conditions[condition] = conditionData
+
+  conditionData['files'].append({'filename':filename, 'details':cellDetails})
 
 xRange = arange(0, 60, 1.0/20000.0)
 
-for dataset in datasets:
-  print('Loading dataset "' + dataset + '"')
-  filenames = glob(dataset + '\\*.abf')
-  all_signals[dataset] = {}
-  
+for conditionName, conditionData in conditions.items():
+  print("Processing", conditionName)
+
   fig = plt.figure(figsize=(20,10),dpi=80)
-  plt.title(dataset)
-  
-  signalCount      = 0
-    
-  for filename in filenames:
-    print('Loading file "' + filename + '"')
-    reader = AxonIO(filename=filename)
+  plt.title(conditionName)
+
+  signalCount = 0
+
+  for file in conditionData['files']:
+    print('Loading file "' + file['filename'] + '"')
+    reader = AxonIO(filename=file['filename'])
     blocks = reader.read()
     assert len(blocks) == 1
     assert len(blocks[0].segments) == 1
     assert len(blocks[0].segments[0].analogsignals) == 1
-    
+
     sig = blocks[0].segments[0].analogsignals[0]
-    
+
     assert(sig.sampling_rate == pq.Quantity(20000, 'Hz'))
     assert(len(sig) == 60*20000)
-    
-    all_signals[dataset][filename] = sig
+
     line = plt.plot(xRange, sig, linewidth=0.5, alpha=0.50)
     plt.setp(line, color='#000000')
-    
+
     if (signalCount == 0):
       sumSignal = sig
       sumSignalSquared = sig * sig
@@ -57,22 +95,22 @@ for dataset in datasets:
       sumSignal += sig
       sumSignalSquared += sig * sig
     signalCount += 1
-   
+
   if signalCount == 0:
     continue
 
   mean = sumSignal / signalCount
   var  = sumSignalSquared / signalCount - mean * mean
   std  = pq.Quantity([sqrt(v.item()) for v in var], 'mV')
-  lb   = mean - std
-  ub   = mean + std
-    
+  ster = std / sqrt(signalCount)
+  lb   = mean - ster
+  ub   = mean + ster
+
   line = plt.plot(xRange, mean, lineWidth=1.0, alpha=1.0)
   plt.setp(line, color='#ff0000')
 
   line = plt.fill_between(xRange, lb, ub, alpha = 0.3)
   plt.setp(line, color='#00ff00')
-  
+
   plt.grid()
-  plt.savefig(dataset + ".png")
- 
+  plt.savefig("Vm " + conditionName + ".png")
