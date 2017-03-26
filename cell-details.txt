@@ -1,1001 +1,123 @@
-path	filename	cell_line	cell_source	protocol	freshness	classification	whole_cell_capacitance	date	notes																
-231-beta1-GFP IV\17314004.abf	17314004.abf	231-beta1-GFP	Primary	IV	fresh		30.82	2017-03-14																	
-231-beta1-GFP IV\17314009.abf	17314009.abf	231-beta1-GFP	Primary	IV	fresh		20.93	2017-03-14																	
-231-beta1-GFP IV\17314029.abf	17314029.abf	231-beta1-GFP	Primary	IV	fresh		16.12	2017-03-14																	
-231-beta1-GFP IV\17314048.abf	17314048.abf	231-beta1-GFP	Primary	IV	fresh		24.68	2017-03-14																	
-231-beta1-GFP IV\17314055.abf	17314055.abf	231-beta1-GFP	Primary	IV	fresh		20.99	2017-03-14																	
-231-beta1-GFP IV\17315021.abf	17315021.abf	231-beta1-GFP	Primary	IV	fresh		25.81	2017-03-15																	
-231-beta1-GFP IV\17315027.abf	17315027.abf	231-beta1-GFP	Primary	IV	fresh		16.23	2017-03-15																	
-231-beta1-GFP IV\17315031.abf	17315031.abf	231-beta1-GFP	Primary	IV	fresh	DISCARD	33.97	2017-03-15	biphasic																
-231-GFP IV\17314016.abf	17314016.abf	231-GFP	Primary	IV	fresh	DISCARD	21.67	2017-03-14																	
-231-GFP IV\17314020.abf	17314020.abf	231-GFP	Primary	IV	fresh		24.14	2017-03-14																	
-231-GFP IV\17314036.abf	17314036.abf	231-GFP	Primary	IV	fresh	DISCARD	22.54	2017-03-14																	
-231-GFP IV\17314044.abf	17314044.abf	231-GFP	Primary	IV	fresh	DISCARD	70.91	2017-03-14	?? Very large cell																
-231-GFP IV\17315002.abf	17315002.abf	231-GFP	Primary	IV	fresh		26.66	2017-03-15																	
-231-GFP IV\17315010.abf	17315010.abf	231-GFP	Primary	IV	fresh		39.69	2017-03-15																	
-231-GFP IV\17315035.abf	17315035.abf	231-GFP	Primary	IV	fresh		29.1	2017-03-15																	
-231-GFP IV\17315043.abf	17315043.abf	231-GFP	Primary	IV	fresh	DISCARD	26.18	2017-03-15																	
-Lung 231-beta1-GFP-FL IV\24hr\17222014.abf	17222014.abf	231-beta1-GFP	Lung	IV	24hr	DISCARD	16.49	2017-02-22	biphasic																
-Lung 231-beta1-GFP-FL IV\24hr\17222024.abf	17222024.abf	231-beta1-GFP	Lung	IV	24hr	DISCARD	15.6	2017-02-22																	
-Lung 231-beta1-GFP-FL IV\24hr\17222029.abf	17222029.abf	231-beta1-GFP	Lung	IV	24hr		18.63	2017-02-22																	
-Lung 231-beta1-GFP-FL IV\24hr\17222034.abf	17222034.abf	231-beta1-GFP	Lung	IV	24hr	SMALL	11.07	2017-02-22																	
-Lung 231-beta1-GFP-FL IV\24hr\17222046.abf	17222046.abf	231-beta1-GFP	Lung	IV	24hr	SMALL	13.58	2017-02-22																	
-Lung 231-beta1-GFP-FL IV\24hr\17222049.abf	17222049.abf	231-beta1-GFP	Lung	IV	24hr		21.61	2017-02-22																	
-Lung 231-beta1-GFP-FL IV\24hr\17222054.abf	17222054.abf	231-beta1-GFP	Lung	IV	24hr	DISCARD	18.08	2017-02-22																	
-Lung 231-beta1-GFP-FL IV\24hr\17222063.abf	17222063.abf	231-beta1-GFP	Lung	IV	24hr	corrected trace 23 using clampfit	31.08	2017-02-22																	
-Lung 231-beta1-GFP-FL IV\fresh\17221004.abf	17221004.abf	231-beta1-GFP	Lung	IV	fresh		41.74	2017-02-21																	
-Lung 231-beta1-GFP-FL IV\fresh\17221009.abf	17221009.abf	231-beta1-GFP	Lung	IV	fresh		13.14	2017-02-21																	
-Lung 231-beta1-GFP-FL IV\fresh\17223003.abf	17223003.abf	231-beta1-GFP	Lung	IV	fresh	DISCARD	7.69	2017-02-23																	
-Lung 231-beta1-GFP-FL IV\fresh\17223008.abf	17223008.abf	231-beta1-GFP	Lung	IV	fresh	SMALL	12.55	2017-02-23																	
-Lung 231-beta1-GFP-FL IV\fresh\17223014.abf	17223014.abf	231-beta1-GFP	Lung	IV	fresh	DISCARD	9.27	2017-02-23	seal went towards end																
-Lung 231-beta1-GFP-FL IV\fresh\17223018.abf	17223018.abf	231-beta1-GFP	Lung	IV	fresh		19.96	2017-02-23																	
-Lung 231-beta1-GFP-FL IV\fresh\17223030.abf	17223030.abf	231-beta1-GFP	Lung	IV	fresh		8.21	2017-02-23																	
-Lung 231-beta1-GFP-FL IV\fresh\17223033.abf	17223033.abf	231-beta1-GFP	Lung	IV	fresh	SMALL	9.81	2017-02-23																	
-Lung 231-beta1-GFP-FL IV\fresh\17223039.abf	17223039.abf	231-beta1-GFP	Lung	IV	fresh		17.95	2017-02-23																	
-Primary 231-beta1-GFP-FL IV\17302004.abf	17302004.abf	231-beta1-GFP-FL	Primary	IV	fresh	DISCARD	7.845	2017-03-02																	
-Primary 231-beta1-GFP-FL IV\17307006.abf	17307006.abf	231-beta1-GFP-FL	Primary	IV	fresh	SMALL	26.56	2017-03-07																	
-Primary 231-beta1-GFP-FL IV\17307010.abf	17307010.abf	231-beta1-GFP-FL	Primary	IV	fresh	SMALL	43.74	2017-03-07																	
-Primary 231-beta1-GFP-FL IV\17307017.abf	17307017.abf	231-beta1-GFP-FL	Primary	IV	fresh		11.8	2017-03-07																	
-Primary 231-beta1-GFP-FL IV\17307026.abf	17307026.abf	231-beta1-GFP-FL	Primary	IV	fresh	SMALL	19.37	2017-03-07																	
-Primary 231-beta1-GFP-FL IV\17307030.abf	17307030.abf	231-beta1-GFP-FL	Primary	IV	fresh		12.86	2017-03-07																	
-Primary 231-beta1-GFP-FL IV\17307042.abf	17307042.abf	231-beta1-GFP-FL	Primary	IV	fresh		11	2017-03-07																	
-Primary 231-beta1-GFP-FL IV\17307048.abf	17307048.abf	231-beta1-GFP-FL	Primary	IV	fresh		11.88	2017-03-07																	
-Primary 231-beta1-GFP-FL IV\17307055.abf	17307055.abf	231-beta1-GFP-FL	Primary	IV	fresh	DISCARD	14.46	2017-03-07																	
-Primary 231-beta1-GFP-FL IV\17307059.abf	17307059.abf	231-beta1-GFP-FL	Primary	IV	fresh	DISCARD	9.636	2017-03-07																	
-Primary 231-GFP-FL IV\24hr\17225003.abf	17225003.abf	231-GFP-FL	Primary	IV	24hr	DISCARD	18.63	2017-02-25																	
-Primary 231-GFP-FL IV\Fresh\17224007.abf	17224007.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	9.49	2017-02-24																	
-Primary 231-GFP-FL IV\Fresh\17224018.abf	17224018.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	30.82	2017-02-24	poor voltage control																
-Primary 231-GFP-FL IV\Fresh\17224022.abf	17224022.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	12.57	2017-02-24																	
-Primary 231-GFP-FL IV\Fresh\17224028.abf	17224028.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	19.96	2017-02-24																	
-Primary 231-GFP-FL IV\Fresh\17224034.abf	17224034.abf	231-GFP-FL	Primary	IV	fresh		20.29	2017-02-24																	
-Primary 231-GFP-FL IV\Fresh\17316002.abf	17316002.abf	231-GFP-FL	Primary	IV	fresh	SMALL	10.23	2017-03-16																	
-Primary 231-GFP-FL IV\Fresh\17316007.abf	17316007.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	3.014	2017-03-16																	
-Primary 231-GFP-FL IV\Fresh\17316012.abf	17316012.abf	231-GFP-FL	Primary	IV	fresh	SMALL	16.23	2017-03-16																	
-Primary 231-GFP-FL IV\Fresh\17316029.abf	17316029.abf	231-GFP-FL	Primary	IV	fresh	SMALL	17.52	2017-03-16																	
-Primary 231-GFP-FL IV\Fresh\17316034.abf	17316034.abf	231-GFP-FL	Primary	IV	fresh		16.6	2017-03-16																	
-Primary 231-GFP-FL IV\Fresh\17316041.abf	17316041.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	9.61	2017-03-16																	
-Primary 231-GFP-FL IV\Fresh\17316045.abf	17316045.abf	231-GFP-FL	Primary	IV	fresh	SMALL	8.633	2017-03-16																	
-Primary 231-GFP-FL IV\Fresh\17317006.abf	17317006.abf	231-GFP-FL	Primary	IV	fresh	SMALL	10.54	2017-03-17																	
-Primary 231-GFP-FL IV\Fresh\17317012.abf	17317012.abf	231-GFP-FL	Primary	IV	fresh		12.17	2017-03-17																	
-Primary 231-GFP-FL IV\Fresh\17317020.abf	17317020.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	5.567	2017-03-17																	
-Primary 231-GFP-FL IV\Fresh\17317028.abf	17317028.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	8.951	2017-03-17																	
-Primary 231-GFP-FL IV\Fresh\17317031.abf	17317031.abf	231-GFP-FL	Primary	IV	fresh		17.52	2017-03-17																	
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
-																									
+path	filename	cell_line	cell_source	protocol	freshness	classification	whole_cell_capacitance	date	notes
+231-beta1-GFP IV\17314004.abf	17314004.abf	231-beta1-GFP	Primary	IV	fresh		30.82	2017-03-14
+231-beta1-GFP IV\17314009.abf	17314009.abf	231-beta1-GFP	Primary	IV	fresh		20.93	2017-03-14
+231-beta1-GFP IV\17314029.abf	17314029.abf	231-beta1-GFP	Primary	IV	fresh		16.12	2017-03-14
+231-beta1-GFP IV\17314048.abf	17314048.abf	231-beta1-GFP	Primary	IV	fresh		24.68	2017-03-14
+231-beta1-GFP IV\17314055.abf	17314055.abf	231-beta1-GFP	Primary	IV	fresh		20.99	2017-03-14
+231-beta1-GFP IV\17315021.abf	17315021.abf	231-beta1-GFP	Primary	IV	fresh		25.81	2017-03-15
+231-beta1-GFP IV\17315027.abf	17315027.abf	231-beta1-GFP	Primary	IV	fresh		16.23	2017-03-15
+231-beta1-GFP IV\17315031.abf	17315031.abf	231-beta1-GFP	Primary	IV	fresh	DISCARD	33.97	2017-03-15	biphasic
+231-GFP IV\17314016.abf	17314016.abf	231-GFP	Primary	IV	fresh	DISCARD	21.67	2017-03-14
+231-GFP IV\17314020.abf	17314020.abf	231-GFP	Primary	IV	fresh		24.14	2017-03-14
+231-GFP IV\17314036.abf	17314036.abf	231-GFP	Primary	IV	fresh	DISCARD	22.54	2017-03-14
+231-GFP IV\17314044.abf	17314044.abf	231-GFP	Primary	IV	fresh	DISCARD	70.91	2017-03-14	?? Very large cell
+231-GFP IV\17315002.abf	17315002.abf	231-GFP	Primary	IV	fresh		26.66	2017-03-15
+231-GFP IV\17315010.abf	17315010.abf	231-GFP	Primary	IV	fresh		39.69	2017-03-15
+231-GFP IV\17315035.abf	17315035.abf	231-GFP	Primary	IV	fresh		29.1	2017-03-15
+231-GFP IV\17315043.abf	17315043.abf	231-GFP	Primary	IV	fresh	DISCARD	26.18	2017-03-15
+Lung 231-beta1-GFP-FL IV\24hr\17222014.abf	17222014.abf	231-beta1-GFP	Lung	IV	24hr	DISCARD	16.49	2017-02-22	biphasic
+Lung 231-beta1-GFP-FL IV\24hr\17222024.abf	17222024.abf	231-beta1-GFP	Lung	IV	24hr	DISCARD	15.6	2017-02-22
+Lung 231-beta1-GFP-FL IV\24hr\17222029.abf	17222029.abf	231-beta1-GFP	Lung	IV	24hr		18.63	2017-02-22
+Lung 231-beta1-GFP-FL IV\24hr\17222034.abf	17222034.abf	231-beta1-GFP	Lung	IV	24hr	SMALL	11.07	2017-02-22
+Lung 231-beta1-GFP-FL IV\24hr\17222046.abf	17222046.abf	231-beta1-GFP	Lung	IV	24hr	SMALL	13.58	2017-02-22
+Lung 231-beta1-GFP-FL IV\24hr\17222049.abf	17222049.abf	231-beta1-GFP	Lung	IV	24hr		21.61	2017-02-22
+Lung 231-beta1-GFP-FL IV\24hr\17222054.abf	17222054.abf	231-beta1-GFP	Lung	IV	24hr	DISCARD	18.08	2017-02-22
+Lung 231-beta1-GFP-FL IV\24hr\17222063.abf	17222063.abf	231-beta1-GFP	Lung	IV	24hr	corrected trace 23 using clampfit	31.08	2017-02-22
+Lung 231-beta1-GFP-FL IV\fresh\17221004.abf	17221004.abf	231-beta1-GFP	Lung	IV	fresh		41.74	2017-02-21
+Lung 231-beta1-GFP-FL IV\fresh\17221009.abf	17221009.abf	231-beta1-GFP	Lung	IV	fresh		13.14	2017-02-21
+Lung 231-beta1-GFP-FL IV\fresh\17223003.abf	17223003.abf	231-beta1-GFP	Lung	IV	fresh	DISCARD	7.69	2017-02-23
+Lung 231-beta1-GFP-FL IV\fresh\17223008.abf	17223008.abf	231-beta1-GFP	Lung	IV	fresh	SMALL	12.55	2017-02-23
+Lung 231-beta1-GFP-FL IV\fresh\17223014.abf	17223014.abf	231-beta1-GFP	Lung	IV	fresh	DISCARD	9.27	2017-02-23	seal went towards end
+Lung 231-beta1-GFP-FL IV\fresh\17223018.abf	17223018.abf	231-beta1-GFP	Lung	IV	fresh		19.96	2017-02-23
+Lung 231-beta1-GFP-FL IV\fresh\17223030.abf	17223030.abf	231-beta1-GFP	Lung	IV	fresh		8.21	2017-02-23
+Lung 231-beta1-GFP-FL IV\fresh\17223033.abf	17223033.abf	231-beta1-GFP	Lung	IV	fresh	SMALL	9.81	2017-02-23
+Lung 231-beta1-GFP-FL IV\fresh\17223039.abf	17223039.abf	231-beta1-GFP	Lung	IV	fresh		17.95	2017-02-23
+Primary 231-beta1-GFP-FL IV\17302004.abf	17302004.abf	231-beta1-GFP-FL	Primary	IV	fresh	DISCARD	7.845	2017-03-02
+Primary 231-beta1-GFP-FL IV\17307006.abf	17307006.abf	231-beta1-GFP-FL	Primary	IV	fresh	SMALL	26.56	2017-03-07
+Primary 231-beta1-GFP-FL IV\17307010.abf	17307010.abf	231-beta1-GFP-FL	Primary	IV	fresh	SMALL	43.74	2017-03-07
+Primary 231-beta1-GFP-FL IV\17307017.abf	17307017.abf	231-beta1-GFP-FL	Primary	IV	fresh		11.8	2017-03-07
+Primary 231-beta1-GFP-FL IV\17307026.abf	17307026.abf	231-beta1-GFP-FL	Primary	IV	fresh	SMALL	19.37	2017-03-07
+Primary 231-beta1-GFP-FL IV\17307030.abf	17307030.abf	231-beta1-GFP-FL	Primary	IV	fresh		12.86	2017-03-07
+Primary 231-beta1-GFP-FL IV\17307042.abf	17307042.abf	231-beta1-GFP-FL	Primary	IV	fresh		11	2017-03-07
+Primary 231-beta1-GFP-FL IV\17307048.abf	17307048.abf	231-beta1-GFP-FL	Primary	IV	fresh		11.88	2017-03-07
+Primary 231-beta1-GFP-FL IV\17307055.abf	17307055.abf	231-beta1-GFP-FL	Primary	IV	fresh	DISCARD	14.46	2017-03-07
+Primary 231-beta1-GFP-FL IV\17307059.abf	17307059.abf	231-beta1-GFP-FL	Primary	IV	fresh	DISCARD	9.636	2017-03-07
+Primary 231-GFP-FL IV\24hr\17225003.abf	17225003.abf	231-GFP-FL	Primary	IV	24hr	DISCARD	18.63	2017-02-25
+Primary 231-GFP-FL IV\Fresh\17224007.abf	17224007.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	9.49	2017-02-24
+Primary 231-GFP-FL IV\Fresh\17224018.abf	17224018.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	30.82	2017-02-24	poor voltage control
+Primary 231-GFP-FL IV\Fresh\17224022.abf	17224022.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	12.57	2017-02-24
+Primary 231-GFP-FL IV\Fresh\17224028.abf	17224028.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	19.96	2017-02-24
+Primary 231-GFP-FL IV\Fresh\17224034.abf	17224034.abf	231-GFP-FL	Primary	IV	fresh		20.29	2017-02-24
+Primary 231-GFP-FL IV\Fresh\17316002.abf	17316002.abf	231-GFP-FL	Primary	IV	fresh	SMALL	10.23	2017-03-16
+Primary 231-GFP-FL IV\Fresh\17316007.abf	17316007.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	3.014	2017-03-16
+Primary 231-GFP-FL IV\Fresh\17316012.abf	17316012.abf	231-GFP-FL	Primary	IV	fresh	SMALL	16.23	2017-03-16
+Primary 231-GFP-FL IV\Fresh\17316029.abf	17316029.abf	231-GFP-FL	Primary	IV	fresh	SMALL	17.52	2017-03-16
+Primary 231-GFP-FL IV\Fresh\17316034.abf	17316034.abf	231-GFP-FL	Primary	IV	fresh		16.6	2017-03-16
+Primary 231-GFP-FL IV\Fresh\17316041.abf	17316041.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	9.61	2017-03-16
+Primary 231-GFP-FL IV\Fresh\17316045.abf	17316045.abf	231-GFP-FL	Primary	IV	fresh	SMALL	8.633	2017-03-16
+Primary 231-GFP-FL IV\Fresh\17317006.abf	17317006.abf	231-GFP-FL	Primary	IV	fresh	SMALL	10.54	2017-03-17
+Primary 231-GFP-FL IV\Fresh\17317012.abf	17317012.abf	231-GFP-FL	Primary	IV	fresh		12.17	2017-03-17
+Primary 231-GFP-FL IV\Fresh\17317020.abf	17317020.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	5.567	2017-03-17
+Primary 231-GFP-FL IV\Fresh\17317028.abf	17317028.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	8.951	2017-03-17
+Primary 231-GFP-FL IV\Fresh\17317031.abf	17317031.abf	231-GFP-FL	Primary	IV	fresh		17.52	2017-03-17
+231-beta1-GFP Vm\17314003.abf	17314003.abf	231-beta1-GFP	Primary	Vm	fresh			2017-03-14
+231-beta1-GFP Vm\17314008.abf	17314008.abf	231-beta1-GFP	Primary	Vm	fresh			2017-03-14
+231-beta1-GFP Vm\17314028.abf	17314028.abf	231-beta1-GFP	Primary	Vm	fresh			2017-03-14
+231-beta1-GFP Vm\17314047.abf	17314047.abf	231-beta1-GFP	Primary	Vm	fresh			2017-03-14
+231-beta1-GFP Vm\17314054.abf	17314054.abf	231-beta1-GFP	Primary	Vm	fresh			2017-03-14
+231-beta1-GFP Vm\17315018.abf	17315018.abf	231-beta1-GFP	Primary	Vm	fresh			2017-03-15
+231-beta1-GFP Vm\17315020.abf	17315020.abf	231-beta1-GFP	Primary	Vm	fresh			2017-03-15
+231-GFP Vm\17314015.abf	17314015.abf	231-GFP	Primary	Vm	fresh			2017-03-14
+231-GFP Vm\17314019.abf	17314019.abf	231-GFP	Primary	Vm	fresh			2017-03-14
+231-GFP Vm\17314035.abf	17314035.abf	231-GFP	Primary	Vm	fresh			2017-03-14
+231-GFP Vm\17314043.abf	17314043.abf	231-GFP	Primary	Vm	fresh			2017-03-14
+231-GFP Vm\17315001.abf	17315001.abf	231-GFP	Primary	Vm	fresh			2017-03-15
+231-GFP Vm\17315009.abf	17315009.abf	231-GFP	Primary	Vm	fresh			2017-03-15
+231-GFP Vm\17315034.abf	17315034.abf	231-GFP	Primary	Vm	fresh			2017-03-15
+231-GFP Vm\17315040.abf	17315040.abf	231-GFP	Primary	Vm	fresh			2017-03-15
+231-GFP Vm\17315042.abf	17315042.abf	231-GFP	Primary	Vm	fresh			2017-03-15
+Lung 231-beta1-GFP-FL Vm\24hr\17222028.abf	17222028.abf	231-beta1-GFP-FL	Lung	Vm	24hr			2017-02-22
+Lung 231-beta1-GFP-FL Vm\24hr\17222033.abf	17222033.abf	231-beta1-GFP-FL	Lung	Vm	24hr			2017-02-22
+Lung 231-beta1-GFP-FL Vm\24hr\17222040.abf	17222040.abf	231-beta1-GFP-FL	Lung	Vm	24hr			2017-02-22
+Lung 231-beta1-GFP-FL Vm\24hr\17222048.abf	17222048.abf	231-beta1-GFP-FL	Lung	Vm	24hr			2017-02-22
+Lung 231-beta1-GFP-FL Vm\24hr\17222053.abf	17222053.abf	231-beta1-GFP-FL	Lung	Vm	24hr			2017-02-22
+Lung 231-beta1-GFP-FL Vm\24hr\17222059.abf	17222059.abf	231-beta1-GFP-FL	Lung	Vm	24hr			2017-02-22
+Lung 231-beta1-GFP-FL Vm\Fresh\17221003.abf	17221003.abf	231-beta1-GFP-FL	Lung	Vm	fresh			2017-02-21
+Lung 231-beta1-GFP-FL Vm\Fresh\17221008.abf	17221008.abf	231-beta1-GFP-FL	Lung	Vm	fresh			2017-02-21
+Lung 231-beta1-GFP-FL Vm\Fresh\17223002.abf	17223002.abf	231-beta1-GFP-FL	Lung	Vm	fresh			2017-02-23
+Lung 231-beta1-GFP-FL Vm\Fresh\17223006.abf	17223006.abf	231-beta1-GFP-FL	Lung	Vm	fresh			2017-02-23
+Lung 231-beta1-GFP-FL Vm\Fresh\17223013.abf	17223013.abf	231-beta1-GFP-FL	Lung	Vm	fresh			2017-02-23
+Lung 231-beta1-GFP-FL Vm\Fresh\17223016.abf	17223016.abf	231-beta1-GFP-FL	Lung	Vm	fresh			2017-02-23
+Lung 231-beta1-GFP-FL Vm\Fresh\17223032.abf	17223032.abf	231-beta1-GFP-FL	Lung	Vm	fresh			2017-02-23
+Lung 231-beta1-GFP-FL Vm\Fresh\17223038.abf	17223038.abf	231-beta1-GFP-FL	Lung	Vm	fresh			2017-02-23
+Primary 231-beta1-GFP-FL Vm\17302002.abf	17302002.abf	231-beta1-GFP-FL	Primary	Vm	fresh			2017-03-02
+Primary 231-beta1-GFP-FL Vm\17302012.abf	17302012.abf	231-beta1-GFP-FL	Primary	Vm	fresh			2017-03-02
+Primary 231-beta1-GFP-FL Vm\17307002.abf	17307002.abf	231-beta1-GFP-FL	Primary	Vm	fresh			2017-03-07
+Primary 231-beta1-GFP-FL Vm\17307024.abf	17307024.abf	231-beta1-GFP-FL	Primary	Vm	fresh			2017-03-07
+Primary 231-beta1-GFP-FL Vm\17307029.abf	17307029.abf	231-beta1-GFP-FL	Primary	Vm	fresh			2017-03-07
+Primary 231-beta1-GFP-FL Vm\17307040.abf	17307040.abf	231-beta1-GFP-FL	Primary	Vm	fresh			2017-03-07
+Primary 231-beta1-GFP-FL Vm\17307058.abf	17307058.abf	231-beta1-GFP-FL	Primary	Vm	fresh			2017-03-07
+Primary 231-beta1-GFP-FL Vm\17307062.abf	17307062.abf	231-beta1-GFP-FL	Primary	Vm	fresh			2017-03-07
+Primary 231-GFP-FL Vm\24hr\17225002.abf	17225002.abf	231-GFP-FL	Primary	Vm	fresh			2017-02-25
+Primary 231-GFP-FL Vm\Fresh\17223002.abf	17223002.abf	231-GFP-FL	Primary	Vm	fresh			2017-02-23
+Primary 231-GFP-FL Vm\Fresh\17223006.abf	17223006.abf	231-GFP-FL	Primary	Vm	fresh			2017-02-23
+Primary 231-GFP-FL Vm\Fresh\17223013.abf	17223013.abf	231-GFP-FL	Primary	Vm	fresh			2017-02-23
+Primary 231-GFP-FL Vm\Fresh\17223016.abf	17223016.abf	231-GFP-FL	Primary	Vm	fresh			2017-02-23
+Primary 231-GFP-FL Vm\Fresh\17223032.abf	17223032.abf	231-GFP-FL	Primary	Vm	fresh			2017-02-23
+Primary 231-GFP-FL Vm\Fresh\17223038.abf	17223038.abf	231-GFP-FL	Primary	Vm	fresh			2017-02-23
+Primary 231-GFP-FL Vm\Fresh\17224020.abf	17224020.abf	231-GFP-FL	Primary	Vm	fresh			2017-02-24
+Primary 231-GFP-FL Vm\Fresh\17224025.abf	17224025.abf	231-GFP-FL	Primary	Vm	fresh			2017-02-24
+Primary 231-GFP-FL Vm\Fresh\17224027.abf	17224027.abf	231-GFP-FL	Primary	Vm	fresh			2017-02-24
+Primary 231-GFP-FL Vm\Fresh\17224033.abf	17224033.abf	231-GFP-FL	Primary	Vm	fresh			2017-02-24
+Primary 231-GFP-FL Vm\Fresh\17316001.abf	17316001.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-16
+Primary 231-GFP-FL Vm\Fresh\17316011.abf	17316011.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-16
+Primary 231-GFP-FL Vm\Fresh\17316028.abf	17316028.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-16
+Primary 231-GFP-FL Vm\Fresh\17316033.abf	17316033.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-16
+Primary 231-GFP-FL Vm\Fresh\17316038.abf	17316038.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-16
+Primary 231-GFP-FL Vm\Fresh\17316039.abf	17316039.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-16
+Primary 231-GFP-FL Vm\Fresh\17316044.abf	17316044.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-16
+Primary 231-GFP-FL Vm\Fresh\17317005.abf	17317005.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-17
+Primary 231-GFP-FL Vm\Fresh\17317011.abf	17317011.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-17
+Primary 231-GFP-FL Vm\Fresh\17317019.abf	17317019.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-17
+Primary 231-GFP-FL Vm\Fresh\17317023.abf	17317023.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-17
+Primary 231-GFP-FL Vm\Fresh\17317027.abf	17317027.abf	231-GFP-FL	Primary	Vm	fresh			2017-03-17
