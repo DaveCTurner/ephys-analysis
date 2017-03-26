@@ -11,12 +11,32 @@ import quantities as pq
 from glob import glob
 import datetime
 import argparse
+import csv
+from os.path import basename
 
 # Handle command-line arguments
-
 parser = argparse.ArgumentParser(description='IV analysis')
 parser.add_argument('path')
 args = parser.parse_args()
+
+# Load cell-details.txt
+cellDetailsByCell = {}
+with open('cell-details.txt') as cellDetailsFile:
+  cellDetailsReader = csv.DictReader(cellDetailsFile, delimiter='\t')
+  for cellDetailsRow in cellDetailsReader:
+    if (cellDetailsRow['path'] != ''):
+      cellDetailsByCell[cellDetailsRow['filename']] = \
+        { 'filename':               cellDetailsRow['filename']                      \
+        , 'path':                   cellDetailsRow['path']                          \
+        , 'whole_cell_capacitance': float(cellDetailsRow['whole_cell_capacitance']) \
+        , 'cell_line':              cellDetailsRow['cell_line']                     \
+        , 'cell_source':            cellDetailsRow['cell_source']                   \
+        , 'protocol':               cellDetailsRow['protocol']                      \
+        , 'freshness':              cellDetailsRow['freshness']                     \
+        , 'classification':         cellDetailsRow['classification']                \
+        , 'date':                   cellDetailsRow['date']                          \
+        , 'notes':                  cellDetailsRow['notes']                         \
+        }
 
 # Define colour map: 'winter' is kinda green to kinda blue.
 cmap = cm.get_cmap('winter')
@@ -45,12 +65,18 @@ percellfile = open(percellfilename, 'w')
 percellfile.write('Filename\tBest peak (pA)\tMean RMS noise (pA)\tMean P2P noise\n')
 
 for filename in filenames:
-    if (filename.find(' IV\\') == -1):
+    cellDetails = cellDetailsByCell.get(basename(filename), None)
+    if (cellDetails == None):
+      print("No cell details found for", filename)
+      continue
+    
+    if (cellDetails['protocol'] != 'IV'):
       continue
 
     sampleName = filename[len(args.path):]
       
     print ("Processing", sampleName)
+    print ("Details: ", cellDetails)
     
     # Read the file into 'blocks'
     reader = AxonIO(filename=filename)
