@@ -69,6 +69,10 @@ for conditionName, conditionData in conditions.items():
 
   fig = plt.figure(figsize=(20,10),dpi=80)
   plt.title(conditionName)
+  plt.xlabel('Time (s)')
+  plt.ylabel('Vm (mV)')
+  axes = plt.gca()
+  axes.set_ylim([-60,15])
 
   signalCount = 0
 
@@ -113,4 +117,66 @@ for conditionName, conditionData in conditions.items():
   plt.setp(line, color='#00ff00')
 
   plt.grid()
-  plt.savefig("Vm " + conditionName + ".png")
+  plt.savefig("Vm Results\\Vm " + conditionName + ".png")
+  plt.close()
+
+# Open a results file with the date in the filename
+rundate = datetime.datetime.utcnow().replace(microsecond=0) \
+                          .isoformat('-').replace(':','-')
+
+pertracefilename = 'Vm results\\' + rundate + '-results-per-trace.txt'
+print ("Writing per-trace results to", pertracefilename)
+pertracefile = open(pertracefilename, 'w')
+pertracefile.write('\t'.join(['Path'
+                             ,'Filename'
+                             ,'Cell line'
+                             ,'Cell source'
+                             ,'Freshness'
+                             ,'Mean Vm (mV)']) + '\n')
+
+for conditionName, conditionData in conditions.items():
+  for file in conditionData['files']:
+    print('Plotting file "' + file['filename'] + '"')
+
+    fig = plt.figure(figsize=(20,10),dpi=80)
+    plt.title(conditionName)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Vm (mV)')
+    axes = plt.gca()
+    axes.set_ylim([-60,15])
+
+    reader = AxonIO(filename=file['filename'])
+    blocks = reader.read()
+    assert len(blocks) == 1
+    assert len(blocks[0].segments) == 1
+    assert len(blocks[0].segments[0].analogsignals) == 1
+
+    sig = blocks[0].segments[0].analogsignals[0]
+
+    assert(sig.sampling_rate == pq.Quantity(20000, 'Hz'))
+    assert(len(sig) == 60*20000)
+
+    line = plt.plot(xRange, sig, linewidth=0.5)
+    plt.setp(line, color='#000000')
+
+    details = file['details']
+
+    meanVm = mean(sig)
+    meanVm.units = 'mV'
+
+    plt.axhline(meanVm, color='#ff0000', alpha=0.5)
+
+    plt.grid()
+    plt.savefig("Vm Results\\Individuals\\Vm " + conditionName + " - " + details['filename'] + ".png")
+    plt.close()
+
+    pertracefile.write('\t'.join( \
+      [details['path']
+      ,details['filename']
+      ,details['cell_line']
+      ,details['cell_source']
+      ,details['freshness']
+      ,str(meanVm.item())]) + '\n')
+
+
+pertracefile.close()

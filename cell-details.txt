@@ -60,7 +60,6 @@ Primary 231-GFP-FL IV\Fresh\17317012.abf	17317012.abf	231-GFP-FL	Primary	IV	fres
 Primary 231-GFP-FL IV\Fresh\17317020.abf	17317020.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	5.567	2017-03-17
 Primary 231-GFP-FL IV\Fresh\17317028.abf	17317028.abf	231-GFP-FL	Primary	IV	fresh	DISCARD	8.951	2017-03-17
 Primary 231-GFP-FL IV\Fresh\17317031.abf	17317031.abf	231-GFP-FL	Primary	IV	fresh		17.52	2017-03-17
-231-beta1-GFP Vm\17314003.abf	17314003.abf	231-beta1-GFP	Primary	Vm	fresh			2017-03-14
 231-beta1-GFP Vm\17314008.abf	17314008.abf	231-beta1-GFP	Primary	Vm	fresh			2017-03-14
 231-beta1-GFP Vm\17314028.abf	17314028.abf	231-beta1-GFP	Primary	Vm	fresh			2017-03-14
 231-beta1-GFP Vm\17314047.abf	17314047.abf	231-beta1-GFP	Primary	Vm	fresh			2017-03-14
