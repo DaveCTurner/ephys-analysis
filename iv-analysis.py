@@ -40,7 +40,7 @@ rundate = datetime.datetime.utcnow().replace(microsecond=0) \
 pertracefilename = rundate + '-results-per-trace.txt'
 print ("Writing per-trace results to", pertracefilename)
 pertracefile = open(pertracefilename, 'w')
-pertracefile.write('Filename\tsegment\tt_min(s)\tI_min(pA)\t-ve peak(pA)\t"+ve peak(pA)"\n')
+pertracefile.write('Filename\tsegment\tt_min(s)\tI_min(pA)\tnegative noise peak(pA)\tpositive noise peak(pA)\n')
 
 percellfilename = rundate + '-results-per-cell.txt'
 print ("Writing per-cell results to", percellfilename)
