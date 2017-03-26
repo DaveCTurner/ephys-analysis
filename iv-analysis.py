@@ -18,9 +18,6 @@ parser = argparse.ArgumentParser(description='IV analysis')
 parser.add_argument('path')
 args = parser.parse_args()
 
-# Define the moving average window: '0.02' repeated 50 times.
-window = ones(50)/50.0
-
 # Define colour map: 'winter' is kinda green to kinda blue.
 cmap = cm.get_cmap('winter')
 
