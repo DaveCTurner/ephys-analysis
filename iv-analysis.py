@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from neo.io import AxonIO
-from numpy import mean, std, arange, convolve, ones, amin
+from numpy import mean, std, arange, convolve, ones, amin, argmin
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib as mpl
@@ -113,7 +113,7 @@ for filename in filenames:
                               ]
 
         # Find the peak index (number of samples), current and time
-        minIndex = toAnalyse.argmin()
+        minIndex = argmin(toAnalyse)
         minCurrent = toAnalyse[minIndex]
         minTime = minIndex * sample_time_sec + tAnalyseFrom
 
