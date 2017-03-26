@@ -53,31 +53,47 @@ filenames = glob(args.path + '\\**\\*.abf', recursive=True)
 # Open a results file with the date in the filename
 rundate = datetime.datetime.utcnow().replace(microsecond=0) \
                           .isoformat('-').replace(':','-')
-                          
+
 pertracefilename = rundate + '-results-per-trace.txt'
 print ("Writing per-trace results to", pertracefilename)
 pertracefile = open(pertracefilename, 'w')
-pertracefile.write('Filename\tsegment\tt_min(s)\tI_min(pA)\tnegative noise peak(pA)\tpositive noise peak(pA)\n')
+pertracefile.write('\t'.join(['Path'
+                             ,'Filename'
+                             ,'Cell line'
+                             ,'Cell source'
+                             ,'Freshness'
+                             ,'Segment number'
+                             ,'Voltage(mV)'
+                             ,'Driving force for Na+ (mV)'
+                             ,'Time to peak (s)'
+                             ,'I_min(pA)'
+                             ,'WCC (pF)'
+                             ,'Peak current density(pA/pF)'
+                             ,'Classification'
+                             ,'Negative noise peak(pA)'
+                             ,'Positive noise peak(pA)']) + '\n')
 
 percellfilename = rundate + '-results-per-cell.txt'
 print ("Writing per-cell results to", percellfilename)
 percellfile = open(percellfilename, 'w')
 percellfile.write('Filename\tBest peak (pA)\tMean RMS noise (pA)\tMean P2P noise\n')
 
+def voltageFromSegmentIndex(segmentIndex):
+  return (5 * segmentIndex - 85)
+
 for filename in filenames:
     cellDetails = cellDetailsByCell.get(basename(filename), None)
     if (cellDetails == None):
       print("No cell details found for", filename)
       continue
-    
+
     if (cellDetails['protocol'] != 'IV'):
       continue
 
     sampleName = filename[len(args.path):]
-      
+
     print ("Processing", sampleName)
-    print ("Details: ", cellDetails)
-    
+
     # Read the file into 'blocks'
     reader = AxonIO(filename=filename)
     blocks = reader.read()
@@ -89,7 +105,7 @@ for filename in filenames:
     plt.ylabel('I (pA)')
     axes = plt.gca()
     axes.set_ylim([-670,100])
-    
+
     # Count how many segments there are and set up the colormap accordingly
     segmentIndex = 0
     segmentCount = len(blocks[0].segments)
@@ -100,7 +116,7 @@ for filename in filenames:
     perCellMinPeak       = 0
     perCellTotalP2PNoise = 0
     perCellTotalRMSNoise = 0
-    
+
     for seg in blocks[0].segments:
         segmentIndex = segmentIndex + 1
 
@@ -115,7 +131,7 @@ for filename in filenames:
 
         # Only take the signal from tStart to tEnd and take out the estimated baseline
         offsetted_I = signal[tStart / sample_time_sec : tEnd / sample_time_sec] - baseline
-        
+
         # Find the +ve and -ve peak noise values
         quiescentSignal = offsetted_I[:tBaselineLength / sample_time_sec]
         peakNoiseNeg = min(quiescentSignal)
@@ -144,25 +160,36 @@ for filename in filenames:
         # Draw a mark at the peak
         mark = plt.plot(minTime, minCurrent, '+')
         plt.setp(mark, color=color)
-        
+
         minCurrent.units = 'pA'
         peakNoiseNeg.units = 'pA'
         peakNoisePos.units = 'pA'
 
         # Write the position of the peak to the results file
-        pertracefile.write(sampleName                + '\t'
-                        + str(segmentIndex)          + '\t'
-                        + str(minTime)               + '\t'
-                        + str(minCurrent.item())     + '\t'
-                        + str(peakNoiseNeg.item())   + '\t'
-                        + str(peakNoisePos.item())   + '\n')
-                        
+        pertracefile.write('\t'.join(
+          [ sampleName
+          , cellDetails['filename']
+          , cellDetails['cell_line']
+          , cellDetails['cell_source']
+          , cellDetails['freshness']
+          , str(segmentIndex)
+          , str(voltageFromSegmentIndex(segmentIndex))
+          , str(voltageFromSegmentIndex(segmentIndex) - 85.1)
+          , str(minTime)
+          , str(minCurrent.item())
+          , str(cellDetails['whole_cell_capacitance'])
+          , str(minCurrent.item() / cellDetails['whole_cell_capacitance'])
+          , cellDetails['classification']
+          , str(peakNoiseNeg.item())
+          , str(peakNoisePos.item())
+          ]) + '\n')
+
         if (minCurrent.item() < perCellMinPeak):
           perCellMinPeak = minCurrent.item()
-        
+
         perCellTotalP2PNoise += peakNoisePos.item() - peakNoiseNeg.item()
         perCellTotalRMSNoise += rmsNoise
-        
+
     percellfile.write(sampleName                     + '\t'
       + str(perCellMinPeak)                          + '\t'
       + str(perCellTotalRMSNoise / segmentCount)     + '\t'
@@ -175,6 +202,6 @@ for filename in filenames:
     plt.grid()
     plt.savefig(filename + '-iv-graph.png')
     plt.close()
-    
+
 pertracefile.close()
 percellfile.close()
