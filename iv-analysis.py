@@ -124,7 +124,7 @@ for filename in filenames:
         peakNoisePos.units = 'pA'
 
         # Write the position of the peak to the results file
-        pertracefile.write(sampleName                 + '\t'
+        pertracefile.write(sampleName                + '\t'
                         + str(segmentIndex)          + '\t'
                         + str(minTime)               + '\t'
                         + str(minCurrent.item())     + '\t'
@@ -137,10 +137,10 @@ for filename in filenames:
         perCellTotalP2PNoise += peakNoisePos.item() - peakNoiseNeg.item()
         perCellTotalRMSNoise += rmsNoise
         
-    percellfile.write(sampleName              + '\t'
-      + str(perCellMinPeak)                   + '\t'
-      + str(perCellTotalRMSNoise / segmentCount) + '\t'
-      + str(perCellTotalP2PNoise / segmentCount) + '\n')
+    percellfile.write(sampleName                     + '\t'
+      + str(perCellMinPeak)                          + '\t'
+      + str(perCellTotalRMSNoise / segmentCount)     + '\t'
+      + str(perCellTotalP2PNoise / segmentCount)     + '\n')
 
     # Shade the part of the graph where the peak was sought
     plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
