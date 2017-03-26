@@ -88,10 +88,10 @@ for filename in filenames:
         baseline = mean(signal[tStart / sample_time_sec : (tStart + tBaselineLength) / sample_time_sec])
 
         # Only take the signal from tStart to tEnd and take out the estimated baseline
-        offsetted = signal[tStart / sample_time_sec : tEnd / sample_time_sec] - baseline
+        offsetted_I = signal[tStart / sample_time_sec : tEnd / sample_time_sec] - baseline
         
         # Find the +ve and -ve peak noise values
-        quiescentSignal = offsetted[:tBaselineLength / sample_time_sec]
+        quiescentSignal = offsetted_I[:tBaselineLength / sample_time_sec]
         peakNoiseNeg = min(quiescentSignal)
         peakNoisePos = max(quiescentSignal)
         meanSquareNoise = mean(quiescentSignal**2)
@@ -100,12 +100,13 @@ for filename in filenames:
 
         # Draw the exact signal
         line = plt.plot(arange(tStart + tBaselineLength, tAnalyseTo, sample_time_sec),
-                 offsetted[tBaselineLength / sample_time_sec : (tAnalyseTo - tStart) / sample_time_sec], linewidth=0.5, alpha=0.48)
+                 offsetted_I[tBaselineLength / sample_time_sec : (tAnalyseTo - tStart) / sample_time_sec],
+				 linewidth=0.5, alpha=0.48)
         color = colormap.to_rgba(segmentCount - segmentIndex)
         plt.setp(line, color=color)
 
-        # Just take the bit of the smoothed signal that needs searching for the peak
-        toAnalyse = offsetted [ (tAnalyseFrom - tStart) / sample_time_sec
+        # Just take the bit of the signal that needs searching for the peak
+        toAnalyse = offsetted_I [ (tAnalyseFrom - tStart) / sample_time_sec
                               : (tAnalyseTo   - tStart) / sample_time_sec
                               ]
 
