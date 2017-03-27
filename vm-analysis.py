@@ -63,8 +63,10 @@ for filename in filenames:
   conditionData['files'].append({'filename':filename, 'details':cellDetails})
 
 xRange = arange(0, 60, 1.0/20000.0)
+offset = pq.Quantity( -3.8, 'mV')
 
 for conditionName, conditionData in conditions.items():
+  break
   print("Processing", conditionName)
 
   fig = plt.figure(figsize=(20,10),dpi=80)
@@ -84,11 +86,11 @@ for conditionName, conditionData in conditions.items():
     assert len(blocks[0].segments) == 1
     assert len(blocks[0].segments[0].analogsignals) == 1
 
-    sig = blocks[0].segments[0].analogsignals[0]
+    sig = blocks[0].segments[0].analogsignals[0] + offset
 
     assert(sig.sampling_rate == pq.Quantity(20000, 'Hz'))
     assert(len(sig) == 60*20000)
-
+    
     line = plt.plot(xRange, sig, linewidth=0.5, alpha=0.50)
     plt.setp(line, color='#000000')
 
@@ -151,7 +153,7 @@ for conditionName, conditionData in conditions.items():
     assert len(blocks[0].segments) == 1
     assert len(blocks[0].segments[0].analogsignals) == 1
 
-    sig = blocks[0].segments[0].analogsignals[0]
+    sig = blocks[0].segments[0].analogsignals[0] + offset
 
     assert(sig.sampling_rate == pq.Quantity(20000, 'Hz'))
     assert(len(sig) == 60*20000)
@@ -177,6 +179,5 @@ for conditionName, conditionData in conditions.items():
       ,details['cell_source']
       ,details['freshness']
       ,str(meanVm.item())]) + '\n')
-
 
 pertracefile.close()
