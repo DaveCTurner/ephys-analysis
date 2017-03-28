@@ -24,8 +24,6 @@ args = parser.parse_args()
 traceFilesByExperiment = ephysutils.findTraceFiles(searchRoot = args.path, \
      cellDetailsByCell = ephysutils.loadCellDetails('cell-details.txt'))
 
-# Define colour map: 'winter' is kinda green to kinda blue.
-cmap = cm.get_cmap('winter')
 
 # Define time points for the analysis
 tBaselineStart  = 0.245  # Start estimating the baseline from here
@@ -66,10 +64,13 @@ sample_frequency = pq.Quantity(50000.0, 'Hz')
 sample_time_sec = (pq.Quantity(1.0, 'Hz') / sample_frequency).item()
 segment_count   = 23
 
+# Define colour map for traces 1..23 using 'winter' colour scale (green to blue)
+colormap = cm.ScalarMappable(norm=mpl.colors.Normalize(vmin=1, vmax=segment_count), cmap=cm.get_cmap('winter'))
+
 def selectTimeRange(signal, signalStartTime, selectionStartTime, selectionEndTime):
-  return signal [ (selectionStartTime - signalStartTime) / sample_time_sec
-                : (selectionEndTime - signalStartTime) / sample_time_sec
-                ]
+  startIndex = round((selectionStartTime - signalStartTime) / sample_time_sec)
+  endIndex   = round((selectionEndTime   - signalStartTime) / sample_time_sec)
+  return signal[startIndex:endIndex]
 
 def voltageFromSegmentIndex(segmentIndex):
   return pq.Quantity(5 * segmentIndex - 85, 'mV')
@@ -80,6 +81,8 @@ for experiment in traceFilesByExperiment:
     continue
 
   for condition in traceFilesByCondition:
+    os.makedirs(os.path.join(resultsDirectory, experiment, condition))
+
     for fileWithDetails in traceFilesByCondition[condition]:
       filename    = fileWithDetails['filename']
       cellDetails = fileWithDetails['details']
@@ -104,7 +107,7 @@ for experiment in traceFilesByExperiment:
       cellDetails['segments'] = []
       for segmentIndex in range(segment_count):
 
-        thisSegmentData = {}
+        thisSegmentData = {'segmentIndex': segmentIndex}
         cellDetails['segments'].append(thisSegmentData)
 
         segment = blocks[0].segments[segmentIndex]
@@ -133,7 +136,6 @@ for experiment in traceFilesByExperiment:
         # Only take the signal from tStart to tEnd and take out the estimated baseline
         thisSegmentData['traceToDraw']    = selectTimeRange(signal, 0, tBaselineStart + tBaselineLength, tAnalyseTo)
         toAnalyse                         = selectTimeRange(signal, 0, tAnalyseFrom,                     tAnalyseTo)
-        thisSegmentData['traceToAnalyse'] = toAnalyse
 
         # Find the peak index (number of samples), current and time
         minIndex   = argmin(toAnalyse)
@@ -160,6 +162,30 @@ for experiment in traceFilesByExperiment:
       cellDetails['min_conductance']  = perCellMinConductanceSoFar
       cellDetails['mean_p2p_noise']   = perCellRunningTotalP2PNoise / segment_count
       cellDetails['mean_rms_noise']   = perCellRunningTotalRMSNoise / segment_count
+
+      # Draw the traces for this cell
+      figure = plt.figure(figsize=(20,10), dpi=80)
+      plt.title(sampleName)
+      plt.xlabel('Time (s)')
+      plt.ylabel('I (pA)')
+      axes = plt.gca()
+      axes.set_ylim([-670,100])
+
+      for thisSegmentData in cellDetails['segments']:
+        thisSegmentColor = colormap.to_rgba(segment_count - thisSegmentData['segmentIndex'])
+
+        line = plt.plot([tBaselineStart + tBaselineLength + sample_index * sample_time_sec
+                            for sample_index in range(len(thisSegmentData['traceToDraw']))],
+                        thisSegmentData['traceToDraw'], linewidth=0.5, alpha=0.5)
+        plt.setp(line, color=thisSegmentColor)
+
+        mark = plt.plot(thisSegmentData['time_to_peak'], thisSegmentData['peak_current'], '+')
+        plt.setp(mark, color=thisSegmentColor)
+
+      plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
+      plt.grid()
+      plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'iv-traces-' + cellDetails['filename'] + ".png"))
+      plt.close()
 
 pertracefile.close()
 percellfile.close()
