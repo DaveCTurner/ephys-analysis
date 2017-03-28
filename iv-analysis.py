@@ -246,7 +246,7 @@ for experiment in traceFilesByExperiment:
       stderrs   = [sqrt(var) / sqrt(cellCount)
                   for var in variances]
 
-      plt.errorbar(xData, means, yerr=stderrs, linewidth=2.0, capsize=5.0, color='#000000', capthick=2.0, marker='o', barsabove=True)
+      plt.errorbar(xData, means, yerr=stderrs, linewidth=2.0, capsize=5.0, color='#000000', capthick=2.0, marker='o')
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'normalised-conductance-all.png'))
