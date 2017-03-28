@@ -184,7 +184,7 @@ for filename in filenames:
 
     # Save the graph next to the data file
     plt.grid()
-    plt.savefig(filename + '-iv-graph.png')
+    plt.savefig(os.path.join(resultsDirectory, cellDetails['filename'] + '-iv-traces.png'))
     plt.close()
 
 pertracefile.close()
