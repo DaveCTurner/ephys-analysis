@@ -13,7 +13,7 @@ import datetime
 import argparse
 import csv
 from os.path import basename
-import celldetails
+import ephysutils
 
 # Handle command-line arguments
 parser = argparse.ArgumentParser(description='IV analysis')
@@ -21,7 +21,7 @@ parser.add_argument('path')
 args = parser.parse_args()
 
 # Load cell-details.txt
-cellDetailsByCell = celldetails.loadCellDetails('cell-details.txt')
+cellDetailsByCell = ephysutils.loadCellDetails('cell-details.txt')
 
 # Define colour map: 'winter' is kinda green to kinda blue.
 cmap = cm.get_cmap('winter')
