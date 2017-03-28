@@ -13,6 +13,7 @@ import datetime
 import argparse
 import csv
 from os.path import basename
+import celldetails
 
 # Handle command-line arguments
 parser = argparse.ArgumentParser(description='IV analysis')
@@ -20,28 +21,7 @@ parser.add_argument('path')
 args = parser.parse_args()
 
 # Load cell-details.txt
-cellDetailsByCell = {}
-with open('cell-details.txt') as cellDetailsFile:
-  cellDetailsReader = csv.DictReader(cellDetailsFile, delimiter='\t')
-  for cellDetailsRow in cellDetailsReader:
-    if (cellDetailsRow['path'] != ''):
-
-      # Convert WCC to a number, but only if it's not blank
-      wccString = cellDetailsRow['whole_cell_capacitance']
-      wccVal    = float(wccString) if wccString else None
-
-      cellDetailsByCell[cellDetailsRow['filename']] = \
-        { 'filename':               cellDetailsRow['filename']       \
-        , 'path':                   cellDetailsRow['path']           \
-        , 'whole_cell_capacitance': wccVal                           \
-        , 'cell_line':              cellDetailsRow['cell_line']      \
-        , 'cell_source':            cellDetailsRow['cell_source']    \
-        , 'protocol':               cellDetailsRow['protocol']       \
-        , 'freshness':              cellDetailsRow['freshness']      \
-        , 'classification':         cellDetailsRow['classification'] \
-        , 'date':                   cellDetailsRow['date']           \
-        , 'notes':                  cellDetailsRow['notes']          \
-        }
+cellDetailsByCell = celldetails.loadCellDetails('cell-details.txt')
 
 # Define colour map: 'winter' is kinda green to kinda blue.
 cmap = cm.get_cmap('winter')
