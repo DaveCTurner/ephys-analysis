@@ -73,9 +73,9 @@ def findTraceFiles(searchRoot, cellDetailsByCell):
 
     thisCondition = thisProtocol.get(condition, None)
     if (thisCondition == None):
-      thisCondition = []
+      thisCondition = {'files':[]}
       thisProtocol[condition] = thisCondition
 
-    thisCondition.append({'filename':filename, 'details':cellDetails})
+    thisCondition['files'].append({'filename':filename, 'details':cellDetails})
 
   return traceFiles

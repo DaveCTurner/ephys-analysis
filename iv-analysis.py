@@ -106,8 +106,9 @@ for experiment in traceFilesByExperiment:
   for condition in traceFilesByCondition:
     os.makedirs(os.path.join(resultsDirectory, experiment, condition))
     conditionActivationVoltage = None
+    conditionFiles = traceFilesByCondition[condition]['files']
 
-    for fileWithDetails in traceFilesByCondition[condition]:
+    for fileWithDetails in conditionFiles:
       filename    = fileWithDetails['filename']
       cellDetails = fileWithDetails['details']
 
@@ -338,7 +339,7 @@ for experiment in traceFilesByExperiment:
     runningTotal       = np.zeros(segment_count)
     runningSquareTotal = np.zeros(segment_count)
 
-    for fileWithDetails in traceFilesByCondition[condition]:
+    for fileWithDetails in conditionFiles:
       filename    = fileWithDetails['filename']
       cellDetails = fileWithDetails['details']
       if cellDetails['classification'] != '':
@@ -383,7 +384,7 @@ for experiment in traceFilesByExperiment:
     runningTotal       = np.zeros(segment_count)
     runningSquareTotal = np.zeros(segment_count)
 
-    for fileWithDetails in traceFilesByCondition[condition]:
+    for fileWithDetails in conditionFiles:
       filename    = fileWithDetails['filename']
       cellDetails = fileWithDetails['details']
       if cellDetails['classification'] != '':
@@ -428,7 +429,7 @@ for experiment in traceFilesByExperiment:
     runningTotal       = np.zeros(segment_count)
     runningSquareTotal = np.zeros(segment_count)
 
-    for fileWithDetails in traceFilesByCondition[condition]:
+    for fileWithDetails in conditionFiles:
       filename    = fileWithDetails['filename']
       cellDetails = fileWithDetails['details']
       if cellDetails['classification'] != '':
