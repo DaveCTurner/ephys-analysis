@@ -1,18 +1,4 @@
-#!/usr/bin/python
-# coding: utf-8
-
-from neo.io import AxonIO
-from numpy import mean, std, arange, convolve, ones, amin, argmin
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import matplotlib as mpl
-from math import floor, sqrt
-import quantities as pq
-from glob import glob
-import datetime
-import argparse
 import csv
-from os.path import basename
 
 def loadCellDetails(cellDetailsFilename):
   # Load cell-details.txt
@@ -38,4 +24,5 @@ def loadCellDetails(cellDetailsFilename):
           , 'date':                   cellDetailsRow['date']           \
           , 'notes':                  cellDetailsRow['notes']          \
           }
+
   return cellDetailsByCell
