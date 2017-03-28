@@ -232,7 +232,7 @@ for experiment in traceFilesByExperiment:
         xData.append(thisSegmentData['voltage'])
         yData.append(thisSegmentData['normalised_conductance'])
 
-      line = plt.plot(xData, yData)
+      line = plt.plot(xData, yData, zorder=1)
       plt.setp(line, color='#c0c0c0')
 
       yData = np.array(yData)
@@ -246,7 +246,7 @@ for experiment in traceFilesByExperiment:
       stderrs   = [sqrt(var) / sqrt(cellCount)
                   for var in variances]
 
-      plt.errorbar(xData, means, yerr=stderrs, linewidth=2.0, capsize=5.0, color='#000000', capthick=2.0, marker='o')
+      plt.errorbar(xData, means, yerr=stderrs, linewidth=2.0, capsize=5.0, color='#000000', capthick=2.0, marker='o', zorder=2)
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'normalised-conductance-all.png'))
