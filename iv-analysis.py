@@ -245,7 +245,7 @@ for experiment in traceFilesByExperiment:
       plt.grid()
       plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'iv-traces-' + cellDetails['filename'] + ".png"))
       plt.close()
-      
+
       # Draw the IV curve for this cell
       figure = plt.figure(figsize=(20,10), dpi=80)
       plt.title(sampleName)
@@ -325,7 +325,7 @@ for experiment in traceFilesByExperiment:
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'current-density-all.png'))
     plt.close()
-    
+
     # Draw the activation curves for all cells in this condition
     figure = plt.figure(figsize=(20,10), dpi=80)
     plt.title(os.path.join(experiment, condition))
