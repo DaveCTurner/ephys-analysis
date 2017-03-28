@@ -1,4 +1,6 @@
 import csv
+import datetime
+import os
 
 def loadCellDetails(cellDetailsFilename):
   # Load cell-details.txt
@@ -26,3 +28,10 @@ def loadCellDetails(cellDetailsFilename):
           }
 
   return cellDetailsByCell
+
+def makeResultsDirectory():
+  rundate = datetime.datetime.utcnow().replace(microsecond=0) \
+                          .isoformat('-').replace(':','-')
+  dirname = os.path.join('results', rundate)
+  os.makedirs(dirname)
+  return dirname

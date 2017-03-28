@@ -12,7 +12,7 @@ from glob import glob
 import datetime
 import argparse
 import csv
-from os.path import basename
+import os.path
 import ephysutils
 
 # Handle command-line arguments
@@ -36,10 +36,9 @@ tAnalyseTo      = 0.263  # Look for peaks before this time
 filenames = glob(args.path + '\\**\\*.abf', recursive=True)
 
 # Open a results file with the date in the filename
-rundate = datetime.datetime.utcnow().replace(microsecond=0) \
-                          .isoformat('-').replace(':','-')
+resultsDirectory = ephysutils.makeResultsDirectory()
 
-pertracefilename = rundate + '-results-per-trace.txt'
+pertracefilename = os.path.join(resultsDirectory, 'results-per-trace.txt')
 print ("Writing per-trace results to", pertracefilename)
 pertracefile = open(pertracefilename, 'w')
 pertracefile.write('\t'.join(['Path'
@@ -58,7 +57,7 @@ pertracefile.write('\t'.join(['Path'
                              ,'Negative noise peak(pA)'
                              ,'Positive noise peak(pA)']) + '\n')
 
-percellfilename = rundate + '-results-per-cell.txt'
+percellfilename = os.path.join(resultsDirectory, 'results-per-cell.txt')
 print ("Writing per-cell results to", percellfilename)
 percellfile = open(percellfilename, 'w')
 percellfile.write('Filename\tBest peak (pA)\tMean RMS noise (pA)\tMean P2P noise\n')
@@ -67,7 +66,7 @@ def voltageFromSegmentIndex(segmentIndex):
   return (5 * segmentIndex - 85)
 
 for filename in filenames:
-    cellDetails = cellDetailsByCell.get(basename(filename), None)
+    cellDetails = cellDetailsByCell.get(os.path.basename(filename), None)
     if (cellDetails == None):
       print("No cell details found for", filename)
       continue
