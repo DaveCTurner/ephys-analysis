@@ -47,12 +47,17 @@ pertracefile.write('\t'.join(['Path'
                              ,'Freshness'
                              ,'Segment number'
                              ,'Voltage(mV)'
+                             ,'Use peak or mean'
                              ,'Driving force for Na+ (mV)'
                              ,'Time to peak (s)'
                              ,'I_min(pA)'
+                             ,'I_mean(pA)'
+                             ,'I_selected(pA)'
                              ,'WCC (pF)'
                              ,'Peak current density(pA/pF)'
-                             ,'Conductance(pA/pF/mV)'
+                             ,'Mean current density(pA/pF)'
+                             ,'Selected current density(pA/pF)'
+                             ,'Peak conductance(pA/pF/mV)'
                              ,'Max conductance(pA/pF/mV)'
                              ,'Normalised conductance'
                              ,'Classification'
@@ -110,7 +115,7 @@ for experiment in traceFilesByExperiment:
 
       print ("Analysing", sampleName)
 
-      if conditionActivationVoltage is not None)
+      if conditionActivationVoltage is not None:
           assert(conditionActivationVoltage == cellDetails['activation_voltage'])
 
       conditionActivationVoltage = cellDetails['activation_voltage']
@@ -168,10 +173,18 @@ for experiment in traceFilesByExperiment:
         thisSegmentData['peak_current_density'] = thisSegmentData['peak_current'] \
                                                 / cellDetails['whole_cell_capacitance']
 
+        thisSegmentData['mean_current']         = mean(toAnalyse)
+        thisSegmentData['mean_current_density'] = thisSegmentData['mean_current'] \
+                                                / cellDetails['whole_cell_capacitance']
+
         thisSegmentData['voltage'] = voltageFromSegmentIndex(segmentIndex)
         thisSegmentData['driving_force'] = thisSegmentData['voltage'] - pq.Quantity(85.1, 'mV')
         thisSegmentData['conductance']   = thisSegmentData['peak_current_density'] \
                                          / thisSegmentData['driving_force']
+
+        thisSegmentData['peak_or_mean'] = 'mean' if thisSegmentData['voltage'] <= conditionActivationVoltage else 'peak'
+        thisSegmentData['selected_current']         = thisSegmentData[thisSegmentData['peak_or_mean'] + '_current']
+        thisSegmentData['selected_current_density'] = thisSegmentData[thisSegmentData['peak_or_mean'] + '_current_density']
 
         if (thisSegmentData['peak_current'] < perCellMinPeakSoFar):
           perCellMinPeakSoFar = thisSegmentData['peak_current']
@@ -215,11 +228,16 @@ for experiment in traceFilesByExperiment:
                                      ,cellDetails['freshness']
                                      ,str(thisSegmentData['segmentIndex'])
                                      ,str(thisSegmentData['voltage'].item())
+                                     ,thisSegmentData['peak_or_mean']
                                      ,str(thisSegmentData['driving_force'].item())
                                      ,str(thisSegmentData['time_to_peak'].item())
                                      ,str(thisSegmentData['peak_current'].item())
+                                     ,str(thisSegmentData['mean_current'].item())
+                                     ,str(thisSegmentData['selected_current'].item())
                                      ,str(cellDetails['whole_cell_capacitance'].item())
                                      ,str(thisSegmentData['peak_current_density'].item())
+                                     ,str(thisSegmentData['mean_current_density'].item())
+                                     ,str(thisSegmentData['selected_current_density'].item())
                                      ,str(thisSegmentData['conductance'].item())
                                      ,str(cellDetails['max_conductance'].item())
                                      ,str(thisSegmentData['normalised_conductance'].item())
@@ -244,8 +262,9 @@ for experiment in traceFilesByExperiment:
                         thisSegmentData['traceToDraw'], linewidth=0.5, alpha=0.5)
         plt.setp(line, color=thisSegmentColor)
 
-        mark = plt.plot(thisSegmentData['time_to_peak'], thisSegmentData['peak_current'], '+')
-        plt.setp(mark, color=thisSegmentColor)
+        if thisSegmentData['peak_or_mean'] == 'peak':
+          mark = plt.plot(thisSegmentData['time_to_peak'], thisSegmentData['peak_current'], '+')
+          plt.setp(mark, color=thisSegmentColor)
 
       plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
       plt.grid()
@@ -264,7 +283,26 @@ for experiment in traceFilesByExperiment:
         xData.append(thisSegmentData['voltage'])
         yData.append(thisSegmentData['peak_current_density'])
 
-      line = plt.plot(xData, yData)
+      line = plt.plot(xData, yData, linewidth=0.5, zorder=0)
+      plt.setp(line, color='#ff0000')
+
+      xData = []
+      yData = []
+      for thisSegmentData in cellDetails['segments']:
+        xData.append(thisSegmentData['voltage'])
+        yData.append(thisSegmentData['mean_current_density'])
+
+      line = plt.plot(xData, yData, linewidth=0.5, zorder=0)
+      plt.setp(line, color='#00ff00')
+
+
+      xData = []
+      yData = []
+      for thisSegmentData in cellDetails['segments']:
+        xData.append(thisSegmentData['voltage'])
+        yData.append(thisSegmentData['selected_current_density'])
+
+      line = plt.plot(xData, yData, linewidth=1, zorder=1)
       plt.setp(line, color='#000000')
 
       plt.grid()
@@ -290,11 +328,11 @@ for experiment in traceFilesByExperiment:
       plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'normalised-conductance-' + cellDetails['filename'] + '.png'))
       plt.close()
 
-    # Draw the IV curves for all cells in this condition
+    # Draw the IV curves for all cells in this condition, using peak current
     figure = plt.figure(figsize=(20,10), dpi=80)
     plt.title(os.path.join(experiment, condition))
     plt.xlabel('Voltage (mV)')
-    plt.ylabel('Current density (pA/pF)')
+    plt.ylabel('Peak current density (pA/pF)')
 
     cellCount          = 0
     runningTotal       = np.zeros(segment_count)
@@ -332,7 +370,52 @@ for experiment in traceFilesByExperiment:
       plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
 
     plt.grid()
-    plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'current-density-all.png'))
+    plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'peak-current-density-all.png'))
+    plt.close()
+
+    # Draw the IV curves for all cells in this condition, using selected current (peak/mean)
+    figure = plt.figure(figsize=(20,10), dpi=80)
+    plt.title(os.path.join(experiment, condition))
+    plt.xlabel('Voltage (mV)')
+    plt.ylabel('Current density (pA/pF)')
+
+    cellCount          = 0
+    runningTotal       = np.zeros(segment_count)
+    runningSquareTotal = np.zeros(segment_count)
+
+    for fileWithDetails in traceFilesByCondition[condition]:
+      filename    = fileWithDetails['filename']
+      cellDetails = fileWithDetails['details']
+      if cellDetails['classification'] != '':
+        continue
+
+      xData = []
+      yData = []
+      for thisSegmentData in cellDetails['segments']:
+        xData.append(thisSegmentData['voltage'])
+        yData.append(thisSegmentData['selected_current_density'])
+
+      line = plt.plot(xData, yData, zorder=1)
+      plt.setp(line, color='#c0c0c0')
+
+      yData = np.array(yData)
+      runningTotal       += yData
+      runningSquareTotal += yData * yData
+      cellCount          += 1
+
+    if cellCount > 0:
+      means     = runningTotal / cellCount
+      variances = runningSquareTotal / cellCount - means * means
+      stderrs   = [sqrt(var) / sqrt(cellCount)
+                  for var in variances]
+
+      plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
+
+    if (conditionActivationVoltage is not None):
+      plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
+
+    plt.grid()
+    plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'selected-current-density-all.png'))
     plt.close()
 
     # Draw the activation curves for all cells in this condition
