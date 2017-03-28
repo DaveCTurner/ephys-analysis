@@ -51,14 +51,29 @@ pertracefile.write('\t'.join(['Path'
                              ,'I_min(pA)'
                              ,'WCC (pF)'
                              ,'Peak current density(pA/pF)'
+                             ,'Conductance(pA/pF/mV)'
+                             ,'Max conductance(pA/pF/mV)'
+                             ,'Normalised conductance'
                              ,'Classification'
                              ,'Negative noise peak(pA)'
-                             ,'Positive noise peak(pA)']) + '\n')
+                             ,'Positive noise peak(pA)'
+                             ]) + '\n')
 
 percellfilename = os.path.join(resultsDirectory, 'results-per-cell.txt')
 print ("Writing per-cell results to", percellfilename)
 percellfile = open(percellfilename, 'w')
-percellfile.write('Filename\tBest peak (pA)\tMean RMS noise (pA)\tMean P2P noise\n')
+percellfile.write('\t'.join(['Path'
+                            ,'Filename'
+                            ,'Cell line'
+                            ,'Cell source'
+                            ,'Freshness'
+                            ,'WCC (pF)'
+                            ,'Best peak (pA)'
+                            ,'Mean RMS noise (pA)'
+                            ,'Mean P2P noise'
+                            ,'Max Conductance (pA/pF/mV)'
+                            ,'Classification'
+                            ]) + '\n')
 
 # These traces were done at 50 kHz (see assertion below)
 sample_frequency = pq.Quantity(50000.0, 'Hz')
@@ -166,6 +181,42 @@ for experiment in traceFilesByExperiment:
 
       for thisSegmentData in cellDetails['segments']:
         thisSegmentData['normalised_conductance'] = thisSegmentData['conductance'] / cellDetails['max_conductance']
+
+      # Write the per-cell results
+      percellfile.write('\t'.join([cellDetails['path']
+                                  ,cellDetails['filename']
+                                  ,cellDetails['cell_line']
+                                  ,cellDetails['cell_source']
+                                  ,cellDetails['freshness']
+                                  ,str(cellDetails['whole_cell_capacitance'].item())
+                                  ,str(cellDetails['min_peak_current'].item())
+                                  ,str(cellDetails['mean_rms_noise'])
+                                  ,str(cellDetails['mean_p2p_noise'])
+                                  ,str(cellDetails['max_conductance'].item())
+                                  ,cellDetails['classification']
+                                  ]) + '\n')
+
+      # Write the per-trace results
+      for thisSegmentData in cellDetails['segments']:
+        pertracefile.write('\t'.join([cellDetails['path']
+                                     ,cellDetails['filename']
+                                     ,cellDetails['cell_line']
+                                     ,cellDetails['cell_source']
+                                     ,cellDetails['freshness']
+                                     ,str(thisSegmentData['segmentIndex'])
+                                     ,str(thisSegmentData['voltage'].item())
+                                     ,str(thisSegmentData['driving_force'].item())
+                                     ,str(thisSegmentData['time_to_peak'].item())
+                                     ,str(thisSegmentData['peak_current'].item())
+                                     ,str(cellDetails['whole_cell_capacitance'].item())
+                                     ,str(thisSegmentData['peak_current_density'].item())
+                                     ,str(thisSegmentData['conductance'].item())
+                                     ,str(cellDetails['max_conductance'].item())
+                                     ,str(thisSegmentData['normalised_conductance'].item())
+                                     ,cellDetails['classification']
+                                     ,str(thisSegmentData['peakNoiseNeg'].item())
+                                     ,str(thisSegmentData['peakNoisePos'].item())
+                                     ]) + '\n')
 
       # Draw the traces for this cell
       figure = plt.figure(figsize=(20,10), dpi=80)
