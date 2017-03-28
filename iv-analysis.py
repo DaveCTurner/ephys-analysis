@@ -100,6 +100,7 @@ for experiment in traceFilesByExperiment:
 
   for condition in traceFilesByCondition:
     os.makedirs(os.path.join(resultsDirectory, experiment, condition))
+    conditionActivationVoltage = None
 
     for fileWithDetails in traceFilesByCondition[condition]:
       filename    = fileWithDetails['filename']
@@ -108,6 +109,8 @@ for experiment in traceFilesByExperiment:
       sampleName = os.path.join(experiment, condition, cellDetails['filename'], cellDetails['classification'])
 
       print ("Analysing", sampleName)
+
+      conditionActivationVoltage = cellDetails['activation_voltage']
 
       # Read the file into 'blocks'
       reader = AxonIO(filename=filename)
@@ -322,6 +325,9 @@ for experiment in traceFilesByExperiment:
 
       plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
 
+    if (conditionActivationVoltage is not None):
+      plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
+
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'current-density-all.png'))
     plt.close()
@@ -363,6 +369,9 @@ for experiment in traceFilesByExperiment:
                   for var in variances]
 
       plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
+
+    if (conditionActivationVoltage is not None):
+      plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'normalised-conductance-all.png'))

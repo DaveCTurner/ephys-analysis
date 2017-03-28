@@ -16,6 +16,9 @@ def loadCellDetails(cellDetailsFilename):
         wccString = cellDetailsRow['whole_cell_capacitance']
         wccVal    = pq.Quantity(float(wccString), 'pF') if wccString else None
 
+        acVString = cellDetailsRow['activation_voltage']
+        acVVal    = pq.Quantity(float(acVString), 'mV') if acVString else None
+
         cellDetailsByCell[cellDetailsRow['filename']] = \
           { 'filename':               cellDetailsRow['filename']       \
           , 'path':                   cellDetailsRow['path']           \
@@ -28,6 +31,7 @@ def loadCellDetails(cellDetailsFilename):
           , 'date':                   cellDetailsRow['date']           \
           , 'notes':                  cellDetailsRow['notes']          \
           , 'experiment':             cellDetailsRow['experiment']     \
+          , 'activation_voltage':     acVVal                           \
           }
 
   return cellDetailsByCell
