@@ -20,20 +20,19 @@ parser = argparse.ArgumentParser(description='IV analysis')
 parser.add_argument('path')
 args = parser.parse_args()
 
-# Load cell-details.txt
-cellDetailsByCell = ephysutils.loadCellDetails('cell-details.txt')
+# Find trace files
+traceFilesByExperiment = ephysutils.findTraceFiles(searchRoot = args.path, \
+     cellDetailsByCell = ephysutils.loadCellDetails('cell-details.txt'))
 
 # Define colour map: 'winter' is kinda green to kinda blue.
 cmap = cm.get_cmap('winter')
 
 # Define time points for the analysis
-tStart          = 0.245  # Start the graph and start estimating the baseline
+tBaselineStart  = 0.245  # Start estimating the baseline from here
 tBaselineLength = 0.01   # Estimate the baseline for this long
 tEnd            = 0.268  # End the graph
 tAnalyseFrom    = 0.2557 # Look for peaks after this time
 tAnalyseTo      = 0.263  # Look for peaks before this time
-
-filenames = glob(args.path + '\\**\\*.abf', recursive=True)
 
 # Open a results file with the date in the filename
 resultsDirectory = ephysutils.makeResultsDirectory()
@@ -62,130 +61,105 @@ print ("Writing per-cell results to", percellfilename)
 percellfile = open(percellfilename, 'w')
 percellfile.write('Filename\tBest peak (pA)\tMean RMS noise (pA)\tMean P2P noise\n')
 
+# These traces were done at 50 kHz (see assertion below)
+sample_frequency = pq.Quantity(50000.0, 'Hz')
+sample_time_sec = (pq.Quantity(1.0, 'Hz') / sample_frequency).item()
+segment_count   = 23
+
+def selectTimeRange(signal, signalStartTime, selectionStartTime, selectionEndTime):
+  return signal [ (selectionStartTime - signalStartTime) / sample_time_sec
+                : (selectionEndTime - signalStartTime) / sample_time_sec
+                ]
+
 def voltageFromSegmentIndex(segmentIndex):
-  return (5 * segmentIndex - 85)
+  return pq.Quantity(5 * segmentIndex - 85, 'mV')
 
-for filename in filenames:
-    cellDetails = cellDetailsByCell.get(os.path.basename(filename), None)
-    if (cellDetails == None):
-      print("No cell details found for", filename)
-      continue
+for experiment in traceFilesByExperiment:
+  traceFilesByCondition = traceFilesByExperiment[experiment].get('IV', None)
+  if traceFilesByCondition == None:
+    continue
 
-    if (cellDetails['protocol'] != 'IV'):
-      continue
+  for condition in traceFilesByCondition:
+    for fileWithDetails in traceFilesByCondition[condition]:
+      filename    = fileWithDetails['filename']
+      cellDetails = fileWithDetails['details']
 
-    sampleName = filename[len(args.path):]
+      sampleName = os.path.join(experiment, condition, cellDetails['filename'])
 
-    print ("Processing", sampleName)
+      print ("Analysing", sampleName)
 
-    # Read the file into 'blocks'
-    reader = AxonIO(filename=filename)
-    blocks = reader.read()
+      # Read the file into 'blocks'
+      reader = AxonIO(filename=filename)
+      blocks = reader.read()
 
-    # Create a new graph
-    fig = plt.figure(figsize=(20,10),dpi=80)
-    plt.title(sampleName)
-    plt.xlabel('Time (s)')
-    plt.ylabel('I (pA)')
-    axes = plt.gca()
-    axes.set_ylim([-670,100])
+      assert len(blocks) == 1
+      assert len(blocks[0].segments) == segment_count
 
-    # Count how many segments there are and set up the colormap accordingly
-    segmentIndex = 0
-    segmentCount = len(blocks[0].segments)
-    norm = mpl.colors.Normalize(vmin=1, vmax=segmentCount)
-    colormap = cm.ScalarMappable(norm=norm, cmap=cmap)
+      # Per-cell statistics
+      perCellMinPeakSoFar         = pq.Quantity(0, 'pA')
+      perCellMinConductanceSoFar  = pq.Quantity(0, 'pA/pF/mV')
+      perCellRunningTotalP2PNoise = 0
+      perCellRunningTotalRMSNoise = 0
 
-    # Per-cell statistics
-    perCellMinPeak       = 0
-    perCellTotalP2PNoise = 0
-    perCellTotalRMSNoise = 0
+      cellDetails['segments'] = []
+      for segmentIndex in range(segment_count):
 
-    for seg in blocks[0].segments:
-        segmentIndex = segmentIndex + 1
+        thisSegmentData = {}
+        cellDetails['segments'].append(thisSegmentData)
+
+        segment = blocks[0].segments[segmentIndex]
 
         # Use the corrected signal [1] as opposed to the uncorrected [0]
-        signal = seg.analogsignals[1]
+        assert len(segment.analogsignals) == 2
+        signal = segment.analogsignals[1]
+        assert(signal.units == pq.Quantity(1.0, 'pA'))
 
-        # Calculate the length of each sample in seconds
-        sample_time_sec = (pq.Quantity(1, 'Hz') / signal.sampling_rate).item()
+        assert(signal.sampling_rate == sample_frequency)
+        # assert(len(signal) == 60*50000) ## TODO
 
-        # Estimate the baseline
-        baseline = mean(signal[tStart / sample_time_sec : (tStart + tBaselineLength) / sample_time_sec])
+        # Estimate the baseline from the quiescent signal
+        quiescentSignalWithoutOffset = selectTimeRange(signal, 0, tBaselineStart, tBaselineStart + tBaselineLength)
+        baseline                     = mean(quiescentSignalWithoutOffset)
+        signal                       = signal - baseline
 
-        # Only take the signal from tStart to tEnd and take out the estimated baseline
-        offsetted_I = signal[tStart / sample_time_sec : tEnd / sample_time_sec] - baseline
-
-        # Find the +ve and -ve peak noise values
-        quiescentSignal = offsetted_I[:tBaselineLength / sample_time_sec]
-        peakNoiseNeg = min(quiescentSignal)
-        peakNoisePos = max(quiescentSignal)
+        # Analyse the noise from the quiescent signal (after applying the offset)
+        quiescentSignal = quiescentSignalWithoutOffset - baseline
+        thisSegmentData['peakNoiseNeg'] = min(quiescentSignal)
+        thisSegmentData['peakNoisePos'] = max(quiescentSignal)
         meanSquareNoise = mean(quiescentSignal**2)
         meanSquareNoise.units = 'pA**2'
-        rmsNoise = sqrt(meanSquareNoise)
+        thisSegmentData['rmsNoise'] = sqrt(meanSquareNoise)
 
-        # Draw the exact signal
-        line = plt.plot(arange(tStart + tBaselineLength, tAnalyseTo, sample_time_sec),
-                 offsetted_I[tBaselineLength / sample_time_sec : (tAnalyseTo - tStart) / sample_time_sec],
-				 linewidth=0.5, alpha=0.48)
-        color = colormap.to_rgba(segmentCount - segmentIndex)
-        plt.setp(line, color=color)
-
-        # Just take the bit of the signal that needs searching for the peak
-        toAnalyse = offsetted_I [ (tAnalyseFrom - tStart) / sample_time_sec
-                              : (tAnalyseTo   - tStart) / sample_time_sec
-                              ]
+        # Only take the signal from tStart to tEnd and take out the estimated baseline
+        thisSegmentData['traceToDraw']    = selectTimeRange(signal, 0, tBaselineStart + tBaselineLength, tAnalyseTo)
+        toAnalyse                         = selectTimeRange(signal, 0, tAnalyseFrom,                     tAnalyseTo)
+        thisSegmentData['traceToAnalyse'] = toAnalyse
 
         # Find the peak index (number of samples), current and time
-        minIndex = argmin(toAnalyse)
-        minCurrent = toAnalyse[minIndex]
-        minTime = minIndex * sample_time_sec + tAnalyseFrom
+        minIndex   = argmin(toAnalyse)
+        thisSegmentData['peak_current'] = toAnalyse[minIndex]
+        thisSegmentData['time_to_peak'] = minIndex * sample_time_sec + tAnalyseFrom
+        thisSegmentData['peak_current_density'] = thisSegmentData['peak_current'] \
+                                                / cellDetails['whole_cell_capacitance']
 
-        # Draw a mark at the peak
-        mark = plt.plot(minTime, minCurrent, '+')
-        plt.setp(mark, color=color)
+        thisSegmentData['voltage'] = voltageFromSegmentIndex(segmentIndex)
+        thisSegmentData['driving_force'] = thisSegmentData['voltage'] - pq.Quantity(85.1, 'mV')
+        thisSegmentData['conductance']   = thisSegmentData['peak_current_density'] \
+                                         / thisSegmentData['driving_force']
 
-        minCurrent.units = 'pA'
-        peakNoiseNeg.units = 'pA'
-        peakNoisePos.units = 'pA'
+        if (thisSegmentData['peak_current'] < perCellMinPeakSoFar):
+          perCellMinPeakSoFar = thisSegmentData['peak_current']
 
-        # Write the position of the peak to the results file
-        pertracefile.write('\t'.join(
-          [ sampleName
-          , cellDetails['filename']
-          , cellDetails['cell_line']
-          , cellDetails['cell_source']
-          , cellDetails['freshness']
-          , str(segmentIndex)
-          , str(voltageFromSegmentIndex(segmentIndex))
-          , str(voltageFromSegmentIndex(segmentIndex) - 85.1)
-          , str(minTime)
-          , str(minCurrent.item())
-          , str(cellDetails['whole_cell_capacitance'])
-          , str(minCurrent.item() / cellDetails['whole_cell_capacitance'])
-          , cellDetails['classification']
-          , str(peakNoiseNeg.item())
-          , str(peakNoisePos.item())
-          ]) + '\n')
+        if (thisSegmentData['conductance'] < perCellMinConductanceSoFar):
+          perCellMinConductanceSoFar = thisSegmentData['conductance']
 
-        if (minCurrent.item() < perCellMinPeak):
-          perCellMinPeak = minCurrent.item()
+        perCellRunningTotalP2PNoise += thisSegmentData['peakNoisePos'].item() - thisSegmentData['peakNoiseNeg'].item()
+        perCellRunningTotalRMSNoise += thisSegmentData['rmsNoise']
 
-        perCellTotalP2PNoise += peakNoisePos.item() - peakNoiseNeg.item()
-        perCellTotalRMSNoise += rmsNoise
-
-    percellfile.write(sampleName                     + '\t'
-      + str(perCellMinPeak)                          + '\t'
-      + str(perCellTotalRMSNoise / segmentCount)     + '\t'
-      + str(perCellTotalP2PNoise / segmentCount)     + '\n')
-
-    # Shade the part of the graph where the peak was sought
-    plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
-
-    # Save the graph next to the data file
-    plt.grid()
-    plt.savefig(os.path.join(resultsDirectory, cellDetails['filename'] + '-iv-traces.png'))
-    plt.close()
+      cellDetails['min_peak_current'] = perCellMinPeakSoFar
+      cellDetails['min_conductance']  = perCellMinConductanceSoFar
+      cellDetails['mean_p2p_noise']   = perCellRunningTotalP2PNoise / segment_count
+      cellDetails['mean_rms_noise']   = perCellRunningTotalRMSNoise / segment_count
 
 pertracefile.close()
 percellfile.close()
