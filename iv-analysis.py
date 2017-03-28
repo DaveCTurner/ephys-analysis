@@ -110,6 +110,9 @@ for experiment in traceFilesByExperiment:
 
       print ("Analysing", sampleName)
 
+      if conditionActivationVoltage is not None)
+          assert(conditionActivationVoltage == cellDetails['activation_voltage'])
+
       conditionActivationVoltage = cellDetails['activation_voltage']
 
       # Read the file into 'blocks'
