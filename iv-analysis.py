@@ -25,17 +25,22 @@ with open('cell-details.txt') as cellDetailsFile:
   cellDetailsReader = csv.DictReader(cellDetailsFile, delimiter='\t')
   for cellDetailsRow in cellDetailsReader:
     if (cellDetailsRow['path'] != ''):
+
+      # Convert WCC to a number, but only if it's not blank
+      wccString = cellDetailsRow['whole_cell_capacitance']
+      wccVal    = float(wccString) if wccString else None
+
       cellDetailsByCell[cellDetailsRow['filename']] = \
-        { 'filename':               cellDetailsRow['filename']                      \
-        , 'path':                   cellDetailsRow['path']                          \
-        , 'whole_cell_capacitance': float(cellDetailsRow['whole_cell_capacitance']) \
-        , 'cell_line':              cellDetailsRow['cell_line']                     \
-        , 'cell_source':            cellDetailsRow['cell_source']                   \
-        , 'protocol':               cellDetailsRow['protocol']                      \
-        , 'freshness':              cellDetailsRow['freshness']                     \
-        , 'classification':         cellDetailsRow['classification']                \
-        , 'date':                   cellDetailsRow['date']                          \
-        , 'notes':                  cellDetailsRow['notes']                         \
+        { 'filename':               cellDetailsRow['filename']       \
+        , 'path':                   cellDetailsRow['path']           \
+        , 'whole_cell_capacitance': wccVal                           \
+        , 'cell_line':              cellDetailsRow['cell_line']      \
+        , 'cell_source':            cellDetailsRow['cell_source']    \
+        , 'protocol':               cellDetailsRow['protocol']       \
+        , 'freshness':              cellDetailsRow['freshness']      \
+        , 'classification':         cellDetailsRow['classification'] \
+        , 'date':                   cellDetailsRow['date']           \
+        , 'notes':                  cellDetailsRow['notes']          \
         }
 
 # Define colour map: 'winter' is kinda green to kinda blue.
