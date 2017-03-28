@@ -69,7 +69,7 @@ def findTraceFiles(searchRoot, cellDetailsByCell):
       thisProtocol = {}
       thisExperiment[cellDetails['protocol']] = thisProtocol
 
-    condition = " ".join([cellDetails['cell_source'], cellDetails['cell_line'], cellDetails['freshness']]).strip()
+    condition = " ".join([cellDetails['cell_line'], cellDetails['cell_source'], cellDetails['freshness']]).strip()
 
     thisCondition = thisProtocol.get(condition, None)
     if (thisCondition == None):
