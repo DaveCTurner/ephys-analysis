@@ -3,6 +3,7 @@
 
 from neo.io import AxonIO
 from numpy import mean, std, arange, convolve, ones, amin, argmin
+import numpy
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib as mpl
@@ -13,171 +14,150 @@ import datetime
 import argparse
 import csv
 from os.path import basename
+import ephysutils
+import os
 
 # Handle command-line arguments
-parser = argparse.ArgumentParser(description='IV analysis')
+parser = argparse.ArgumentParser(description='Vm analysis')
 parser.add_argument('path')
 args = parser.parse_args()
 
-# Load cell-details.txt
-cellDetailsByCell = {}
-with open('cell-details.txt') as cellDetailsFile:
-  cellDetailsReader = csv.DictReader(cellDetailsFile, delimiter='\t')
-  for cellDetailsRow in cellDetailsReader:
-    if (cellDetailsRow['path'] != ''):
-      cellDetailsByCell[cellDetailsRow['filename']] = \
-        { 'filename':               cellDetailsRow['filename']                      \
-        , 'path':                   cellDetailsRow['path']                          \
-        , 'cell_line':              cellDetailsRow['cell_line']                     \
-        , 'cell_source':            cellDetailsRow['cell_source']                   \
-        , 'protocol':               cellDetailsRow['protocol']                      \
-        , 'freshness':              cellDetailsRow['freshness']                     \
-        , 'classification':         cellDetailsRow['classification']                \
-        , 'date':                   cellDetailsRow['date']                          \
-        , 'notes':                  cellDetailsRow['notes']                         \
-        }
-
-filenames = glob(args.path + '\\**\\*.abf', recursive=True)
-
-conditions = {}
-
-for filename in filenames:
-  cellDetails = cellDetailsByCell.get(basename(filename), None)
-  if (cellDetails == None):
-    print("No cell details for", filename)
-    continue
-
-  if (cellDetails['protocol'] != 'Vm'):
-    continue
-
-  if (cellDetails['classification'] == 'DISCARD'):
-    continue
-
-  condition = " ".join([cellDetails['cell_source'], cellDetails['cell_line'], cellDetails['freshness']])
-
-  conditionData = conditions.get(condition, None)
-  if (conditionData == None):
-    conditionData = {'files': []}
-    conditions[condition] = conditionData
-
-  conditionData['files'].append({'filename':filename, 'details':cellDetails})
-
-xRange = arange(0, 60, 1.0/20000.0)
-offset = pq.Quantity( -3.8, 'mV')
-
-for conditionName, conditionData in conditions.items():
-  break
-  print("Processing", conditionName)
-
-  fig = plt.figure(figsize=(20,10),dpi=80)
-  plt.title(conditionName)
-  plt.xlabel('Time (s)')
-  plt.ylabel('Vm (mV)')
-  axes = plt.gca()
-  axes.set_ylim([-60,15])
-
-  signalCount = 0
-
-  for file in conditionData['files']:
-    print('Loading file "' + file['filename'] + '"')
-    reader = AxonIO(filename=file['filename'])
-    blocks = reader.read()
-    assert len(blocks) == 1
-    assert len(blocks[0].segments) == 1
-    assert len(blocks[0].segments[0].analogsignals) == 1
-
-    sig = blocks[0].segments[0].analogsignals[0] + offset
-
-    assert(sig.sampling_rate == pq.Quantity(20000, 'Hz'))
-    assert(len(sig) == 60*20000)
-    
-    line = plt.plot(xRange, sig, linewidth=0.5, alpha=0.50)
-    plt.setp(line, color='#000000')
-
-    if (signalCount == 0):
-      sumSignal = sig
-      sumSignalSquared = sig * sig
-    else:
-      sumSignal += sig
-      sumSignalSquared += sig * sig
-    signalCount += 1
-
-  if signalCount == 0:
-    continue
-
-  mean = sumSignal / signalCount
-  var  = sumSignalSquared / signalCount - mean * mean
-  std  = pq.Quantity([sqrt(v.item()) for v in var], 'mV')
-  ster = std / sqrt(signalCount)
-  lb   = mean - ster
-  ub   = mean + ster
-
-  line = plt.plot(xRange, mean, lineWidth=1.0, alpha=1.0)
-  plt.setp(line, color='#ff0000')
-
-  line = plt.fill_between(xRange, lb, ub, alpha = 0.3)
-  plt.setp(line, color='#00ff00')
-
-  plt.grid()
-  plt.savefig("Vm Results\\Vm " + conditionName + ".png")
-  plt.close()
+# Find trace files
+traceFilesByExperiment = ephysutils.findTraceFiles(searchRoot = args.path, \
+     cellDetailsByCell = ephysutils.loadCellDetails('cell-details.txt'))
 
 # Open a results file with the date in the filename
-rundate = datetime.datetime.utcnow().replace(microsecond=0) \
-                          .isoformat('-').replace(':','-')
+resultsDirectory = ephysutils.makeResultsDirectory()
 
-pertracefilename = 'Vm results\\' + rundate + '-results-per-trace.txt'
-print ("Writing per-trace results to", pertracefilename)
+pertracefilename = os.path.join(resultsDirectory, 'Vm-results.txt')
 pertracefile = open(pertracefilename, 'w')
 pertracefile.write('\t'.join(['Path'
                              ,'Filename'
+                             ,'Experiment'
                              ,'Cell line'
                              ,'Cell source'
                              ,'Freshness'
-                             ,'Mean Vm (mV)']) + '\n')
+                             ,'Mean Vm (mV)'
+                             ]) + '\n')
 
-for conditionName, conditionData in conditions.items():
-  for file in conditionData['files']:
-    print('Plotting file "' + file['filename'] + '"')
+xRange = arange(0, 60, 1.0/20000.0)
+offset = pq.Quantity(-3.8, 'mV')
+
+for experiment in traceFilesByExperiment:
+  traceFilesByCondition = traceFilesByExperiment[experiment].get('Vm', None)
+  if traceFilesByCondition == None:
+    continue
+
+  for condition in traceFilesByCondition:
+    os.makedirs(os.path.join(resultsDirectory, experiment, condition))
+
+    signalCount = 0
+    conditionData = traceFilesByCondition[condition]
+    conditionFiles = conditionData['files']
+
+    for fileWithDetails in conditionFiles:
+      cellDetails = fileWithDetails['details']
+      
+      if cellDetails['classification'] == 'DISCARD':
+        continue
+
+      sampleName = os.path.join(experiment, condition, cellDetails['filename'], cellDetails['classification'] or '')
+
+      print ("Analysing", sampleName)
+
+      reader = AxonIO(filename=fileWithDetails['filename'])
+      blocks = reader.read()
+      assert len(blocks) == 1
+      assert len(blocks[0].segments) == 1
+      assert len(blocks[0].segments[0].analogsignals) == 1
+
+      signal = blocks[0].segments[0].analogsignals[0] + offset
+
+      assert(signal.sampling_rate == pq.Quantity(20000, 'Hz'))
+      assert(len(signal) == 60*20000)
+
+      cellDetails['vm_trace'] = signal
+
+      if (signalCount == 0):
+        sumSignal = signal
+        sumSignalSquared = signal * signal
+      else:
+        sumSignal += signal
+        sumSignalSquared += signal * signal
+
+      signalCount += 1
+
+    if signalCount == 0:
+      continue
+
+    mean = sumSignal / signalCount
+    var  = sumSignalSquared / signalCount - mean * mean
+    std  = pq.Quantity([sqrt(v.item()) for v in var], 'mV')
+    ster = std / sqrt(signalCount)
+    lb   = mean - ster
+    ub   = mean + ster
+
+    conditionData['mean_voltage']           = mean
+    conditionData['voltage_standard_error'] = ster
 
     fig = plt.figure(figsize=(20,10),dpi=80)
-    plt.title(conditionName)
+    plt.title(experiment + ' ' + condition)
     plt.xlabel('Time (s)')
     plt.ylabel('Vm (mV)')
     axes = plt.gca()
-    axes.set_ylim([-60,15])
+    axes.set_ylim([-180,15])
 
-    reader = AxonIO(filename=file['filename'])
-    blocks = reader.read()
-    assert len(blocks) == 1
-    assert len(blocks[0].segments) == 1
-    assert len(blocks[0].segments[0].analogsignals) == 1
+    for fileWithDetails in conditionFiles:
+      cellDetails = fileWithDetails['details']
+      if cellDetails['classification'] == 'DISCARD':
+        continue
 
-    sig = blocks[0].segments[0].analogsignals[0] + offset
+      line = plt.plot(xRange, cellDetails['vm_trace'], linewidth=0.5, alpha=0.50, zorder=0)
+      plt.setp(line, color='#000000')
 
-    assert(sig.sampling_rate == pq.Quantity(20000, 'Hz'))
-    assert(len(sig) == 60*20000)
+    line = plt.fill_between(xRange, mean - ster, mean + ster, alpha = 0.3, zorder=1)
+    plt.setp(line, color='#00ff00')
 
-    line = plt.plot(xRange, sig, linewidth=0.5)
-    plt.setp(line, color='#000000')
-
-    details = file['details']
-
-    meanVm = mean(sig)
-    meanVm.units = 'mV'
-
-    plt.axhline(meanVm, color='#ff0000', alpha=0.5)
+    line = plt.plot(xRange, mean, lineWidth=1.0, alpha=1.0, zorder=2)
+    plt.setp(line, color='#ff0000')
 
     plt.grid()
-    plt.savefig("Vm Results\\Individuals\\Vm " + conditionName + " - " + details['filename'] + ".png")
+    plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'Vm-all.png'))
     plt.close()
 
-    pertracefile.write('\t'.join( \
-      [details['path']
-      ,details['filename']
-      ,details['cell_line']
-      ,details['cell_source']
-      ,details['freshness']
-      ,str(meanVm.item())]) + '\n')
+    for fileWithDetails in conditionFiles:
+      details = fileWithDetails['details']
+      filename = details['filename']
+      if details['classification'] == 'DISCARD':
+        continue
+
+      fig = plt.figure(figsize=(20,10),dpi=80)
+      plt.title(experiment + ' ' + condition + ' ' + filename)
+      plt.xlabel('Time (s)')
+      plt.ylabel('Vm (mV)')
+      axes = plt.gca()
+      axes.set_ylim([-180,15])
+
+      signal = details['vm_trace']
+
+      line = plt.plot(xRange, signal, linewidth=1.0, alpha=1.0, zorder=1)
+      plt.setp(line, color='#000000')
+
+      meanVm = numpy.mean(signal)
+      meanVm.units = 'mV'
+      plt.axhline(meanVm, color='#ff0000', alpha=0.5, zorder=0)
+
+      plt.grid()
+      plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'Vm-' + filename + '.png'))
+      plt.close()
+
+      pertracefile.write('\t'.join( \
+        [details['path']
+        ,details['filename']
+        ,details['experiment']
+        ,details['cell_line']
+        ,details['cell_source']
+        ,details['freshness']
+        ,str(meanVm.item())]) + '\n')
 
 pertracefile.close()
