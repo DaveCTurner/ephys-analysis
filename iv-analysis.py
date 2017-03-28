@@ -41,6 +41,7 @@ print ("Writing per-trace results to", pertracefilename)
 pertracefile = open(pertracefilename, 'w')
 pertracefile.write('\t'.join(['Path'
                              ,'Filename'
+                             ,'Experiment'
                              ,'Cell line'
                              ,'Cell source'
                              ,'Freshness'
@@ -64,6 +65,7 @@ print ("Writing per-cell results to", percellfilename)
 percellfile = open(percellfilename, 'w')
 percellfile.write('\t'.join(['Path'
                             ,'Filename'
+                            ,'Experiment'
                             ,'Cell line'
                             ,'Cell source'
                             ,'Freshness'
@@ -185,6 +187,7 @@ for experiment in traceFilesByExperiment:
       # Write the per-cell results
       percellfile.write('\t'.join([cellDetails['path']
                                   ,cellDetails['filename']
+                                  ,cellDetails['experiment']
                                   ,cellDetails['cell_line']
                                   ,cellDetails['cell_source']
                                   ,cellDetails['freshness']
@@ -200,6 +203,7 @@ for experiment in traceFilesByExperiment:
       for thisSegmentData in cellDetails['segments']:
         pertracefile.write('\t'.join([cellDetails['path']
                                      ,cellDetails['filename']
+                                     ,cellDetails['experiment']
                                      ,cellDetails['cell_line']
                                      ,cellDetails['cell_source']
                                      ,cellDetails['freshness']
@@ -241,8 +245,27 @@ for experiment in traceFilesByExperiment:
       plt.grid()
       plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'iv-traces-' + cellDetails['filename'] + ".png"))
       plt.close()
-
+      
       # Draw the IV curve for this cell
+      figure = plt.figure(figsize=(20,10), dpi=80)
+      plt.title(sampleName)
+      plt.xlabel('Voltage (mV)')
+      plt.ylabel('Current density (pA/pF)')
+
+      xData = []
+      yData = []
+      for thisSegmentData in cellDetails['segments']:
+        xData.append(thisSegmentData['voltage'])
+        yData.append(thisSegmentData['peak_current_density'])
+
+      line = plt.plot(xData, yData)
+      plt.setp(line, color='#000000')
+
+      plt.grid()
+      plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'current-density-' + cellDetails['filename'] + '.png'))
+      plt.close()
+
+      # Draw the activation curve for this cell
       figure = plt.figure(figsize=(20,10), dpi=80)
       plt.title(sampleName)
       plt.xlabel('Voltage (mV)')
@@ -262,6 +285,48 @@ for experiment in traceFilesByExperiment:
       plt.close()
 
     # Draw the IV curves for all cells in this condition
+    figure = plt.figure(figsize=(20,10), dpi=80)
+    plt.title(os.path.join(experiment, condition))
+    plt.xlabel('Voltage (mV)')
+    plt.ylabel('Current density (pA/pF)')
+
+    cellCount          = 0
+    runningTotal       = np.zeros(segment_count)
+    runningSquareTotal = np.zeros(segment_count)
+
+    for fileWithDetails in traceFilesByCondition[condition]:
+      filename    = fileWithDetails['filename']
+      cellDetails = fileWithDetails['details']
+      if cellDetails['classification'] != '':
+        continue
+
+      xData = []
+      yData = []
+      for thisSegmentData in cellDetails['segments']:
+        xData.append(thisSegmentData['voltage'])
+        yData.append(thisSegmentData['peak_current_density'])
+
+      line = plt.plot(xData, yData, zorder=1)
+      plt.setp(line, color='#c0c0c0')
+
+      yData = np.array(yData)
+      runningTotal       += yData
+      runningSquareTotal += yData * yData
+      cellCount          += 1
+
+    if cellCount > 0:
+      means     = runningTotal / cellCount
+      variances = runningSquareTotal / cellCount - means * means
+      stderrs   = [sqrt(var) / sqrt(cellCount)
+                  for var in variances]
+
+      plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
+
+    plt.grid()
+    plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'current-density-all.png'))
+    plt.close()
+    
+    # Draw the activation curves for all cells in this condition
     figure = plt.figure(figsize=(20,10), dpi=80)
     plt.title(os.path.join(experiment, condition))
     plt.xlabel('Voltage (mV)')
@@ -297,7 +362,7 @@ for experiment in traceFilesByExperiment:
       stderrs   = [sqrt(var) / sqrt(cellCount)
                   for var in variances]
 
-      plt.errorbar(xData, means, yerr=stderrs, linewidth=2.0, capsize=5.0, color='#000000', capthick=2.0, marker='o', zorder=2)
+      plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'normalised-conductance-all.png'))
