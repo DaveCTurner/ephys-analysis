@@ -3,6 +3,7 @@
 
 from neo.io import AxonIO
 from numpy import mean, std, arange, convolve, ones, amin, argmin
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib as mpl
@@ -87,7 +88,7 @@ for experiment in traceFilesByExperiment:
       filename    = fileWithDetails['filename']
       cellDetails = fileWithDetails['details']
 
-      sampleName = os.path.join(experiment, condition, cellDetails['filename'])
+      sampleName = os.path.join(experiment, condition, cellDetails['filename'], cellDetails['classification'])
 
       print ("Analysing", sampleName)
 
@@ -100,7 +101,7 @@ for experiment in traceFilesByExperiment:
 
       # Per-cell statistics
       perCellMinPeakSoFar         = pq.Quantity(0, 'pA')
-      perCellMinConductanceSoFar  = pq.Quantity(0, 'pA/pF/mV')
+      perCellMaxConductanceSoFar  = pq.Quantity(0, 'pA/pF/mV')
       perCellRunningTotalP2PNoise = 0
       perCellRunningTotalRMSNoise = 0
 
@@ -152,16 +153,19 @@ for experiment in traceFilesByExperiment:
         if (thisSegmentData['peak_current'] < perCellMinPeakSoFar):
           perCellMinPeakSoFar = thisSegmentData['peak_current']
 
-        if (thisSegmentData['conductance'] < perCellMinConductanceSoFar):
-          perCellMinConductanceSoFar = thisSegmentData['conductance']
+        if (perCellMaxConductanceSoFar < thisSegmentData['conductance']):
+          perCellMaxConductanceSoFar = thisSegmentData['conductance']
 
         perCellRunningTotalP2PNoise += thisSegmentData['peakNoisePos'].item() - thisSegmentData['peakNoiseNeg'].item()
         perCellRunningTotalRMSNoise += thisSegmentData['rmsNoise']
 
       cellDetails['min_peak_current'] = perCellMinPeakSoFar
-      cellDetails['min_conductance']  = perCellMinConductanceSoFar
+      cellDetails['max_conductance']  = perCellMaxConductanceSoFar
       cellDetails['mean_p2p_noise']   = perCellRunningTotalP2PNoise / segment_count
       cellDetails['mean_rms_noise']   = perCellRunningTotalRMSNoise / segment_count
+
+      for thisSegmentData in cellDetails['segments']:
+        thisSegmentData['normalised_conductance'] = thisSegmentData['conductance'] / cellDetails['max_conductance']
 
       # Draw the traces for this cell
       figure = plt.figure(figsize=(20,10), dpi=80)
@@ -186,6 +190,67 @@ for experiment in traceFilesByExperiment:
       plt.grid()
       plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'iv-traces-' + cellDetails['filename'] + ".png"))
       plt.close()
+
+      # Draw the IV curve for this cell
+      figure = plt.figure(figsize=(20,10), dpi=80)
+      plt.title(sampleName)
+      plt.xlabel('Voltage (mV)')
+      plt.ylabel('Normalised conductance')
+
+      xData = []
+      yData = []
+      for thisSegmentData in cellDetails['segments']:
+        xData.append(thisSegmentData['voltage'])
+        yData.append(thisSegmentData['normalised_conductance'])
+
+      line = plt.plot(xData, yData)
+      plt.setp(line, color='#000000')
+
+      plt.grid()
+      plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'normalised-conductance-' + cellDetails['filename'] + '.png'))
+      plt.close()
+
+    # Draw the IV curves for all cells in this condition
+    figure = plt.figure(figsize=(20,10), dpi=80)
+    plt.title(os.path.join(experiment, condition))
+    plt.xlabel('Voltage (mV)')
+    plt.ylabel('Normalised conductance')
+
+    cellCount          = 0
+    runningTotal       = np.zeros(segment_count)
+    runningSquareTotal = np.zeros(segment_count)
+
+    for fileWithDetails in traceFilesByCondition[condition]:
+      filename    = fileWithDetails['filename']
+      cellDetails = fileWithDetails['details']
+      if cellDetails['classification'] != '':
+        continue
+
+      xData = []
+      yData = []
+      for thisSegmentData in cellDetails['segments']:
+        xData.append(thisSegmentData['voltage'])
+        yData.append(thisSegmentData['normalised_conductance'])
+
+      line = plt.plot(xData, yData)
+      plt.setp(line, color='#c0c0c0')
+
+      yData = np.array(yData)
+      runningTotal       += yData
+      runningSquareTotal += yData * yData
+      cellCount          += 1
+
+    if cellCount > 0:
+      means     = runningTotal / cellCount
+      variances = runningSquareTotal / cellCount - means * means
+      stderrs   = [sqrt(var) / sqrt(cellCount)
+                  for var in variances]
+
+      plt.errorbar(xData, means, yerr=stderrs, linewidth=2.0, capsize=5.0, color='#000000', capthick=2.0, marker='o', barsabove=True)
+
+    plt.grid()
+    plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'normalised-conductance-all.png'))
+    plt.close()
 
 pertracefile.close()
 percellfile.close()
