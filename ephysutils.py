@@ -32,6 +32,7 @@ def loadCellDetails(cellDetailsFilename):
           , 'notes':                  cellDetailsRow['notes']          \
           , 'experiment':             cellDetailsRow['experiment']     \
           , 'activation_voltage':     acVVal                           \
+          , 'cell_identity':          cellDetailsRow['cell_identity']  \
           }
 
   return cellDetailsByCell

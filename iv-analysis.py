@@ -74,6 +74,7 @@ percellfile.write('\t'.join(['Path'
                             ,'Cell line'
                             ,'Cell source'
                             ,'Freshness'
+                            ,'Cell identity'
                             ,'WCC (pF)'
                             ,'Best peak (pA)'
                             ,'Mean RMS noise (pA)'
@@ -211,6 +212,7 @@ for experiment in traceFilesByExperiment:
                                   ,cellDetails['cell_line']
                                   ,cellDetails['cell_source']
                                   ,cellDetails['freshness']
+                                  ,cellDetails['cell_identity']
                                   ,str(cellDetails['whole_cell_capacitance'].item())
                                   ,str(cellDetails['min_peak_current'].item())
                                   ,str(cellDetails['mean_rms_noise'])

@@ -37,6 +37,7 @@ pertracefile.write('\t'.join(['Path'
                              ,'Cell line'
                              ,'Cell source'
                              ,'Freshness'
+                             ,'Cell_identity'
                              ,'Mean Vm (mV)'
                              ]) + '\n')
 
@@ -158,6 +159,7 @@ for experiment in traceFilesByExperiment:
         ,details['cell_line']
         ,details['cell_source']
         ,details['freshness']
+        ,details['cell_identity']
         ,str(meanVm.item())]) + '\n')
 
 pertracefile.close()
