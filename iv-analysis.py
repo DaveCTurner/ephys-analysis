@@ -99,6 +99,9 @@ def selectTimeRange(signal, signalStartTime, selectionStartTime, selectionEndTim
 def voltageFromSegmentIndex(segmentIndex):
   return pq.Quantity(5 * segmentIndex - 85, 'mV')
 
+def doNotProcess(cellDetails):
+  return cellDetails['classification'] != ''
+
 for experiment in traceFilesByExperiment:
   traceFilesByCondition = traceFilesByExperiment[experiment].get('IV', None)
   if traceFilesByCondition == None:
@@ -344,7 +347,7 @@ for experiment in traceFilesByExperiment:
     for fileWithDetails in conditionFiles:
       filename    = fileWithDetails['filename']
       cellDetails = fileWithDetails['details']
-      if cellDetails['classification'] != '':
+      if doNotProcess(cellDetails):
         continue
 
       xData = []
@@ -389,7 +392,7 @@ for experiment in traceFilesByExperiment:
     for fileWithDetails in conditionFiles:
       filename    = fileWithDetails['filename']
       cellDetails = fileWithDetails['details']
-      if cellDetails['classification'] != '':
+      if doNotProcess(cellDetails):
         continue
 
       xData = []
@@ -434,7 +437,7 @@ for experiment in traceFilesByExperiment:
     for fileWithDetails in conditionFiles:
       filename    = fileWithDetails['filename']
       cellDetails = fileWithDetails['details']
-      if cellDetails['classification'] != '':
+      if doNotProcess(cellDetails):
         continue
 
       xData = []
