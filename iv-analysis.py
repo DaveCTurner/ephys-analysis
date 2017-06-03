@@ -32,6 +32,8 @@ tBaselineLength = 0.01   # Estimate the baseline for this long
 tEnd            = 0.268  # End the graph
 tAnalyseFrom    = 0.2557 # Look for peaks after this time
 tAnalyseTo      = 0.263  # Look for peaks before this time
+tPersistentFrom = 0.300  # Start measuring mean persistent current
+tPersistentLength   = 0.015  # Measure mean persistent current for this long
 
 # Open a results file with the date in the filename
 resultsDirectory = ephysutils.makeResultsDirectory()
@@ -160,6 +162,10 @@ for experiment in traceFilesByExperiment:
         baseline                     = mean(quiescentSignalWithoutOffset)
         signal                       = signal - baseline
 
+        # Calculate the mean persistent current
+        persistentCurrent            = selectTimeRange(signal, 0, tPersistentFrom, tPersistentFrom + tPersistentLength)
+        thisSegmentData['mean_persistent_current'] = mean(persistentCurrent)
+
         # Analyse the noise from the quiescent signal (after applying the offset)
         quiescentSignal = quiescentSignalWithoutOffset - baseline
         thisSegmentData['peakNoiseNeg'] = min(quiescentSignal)
@@ -251,6 +257,7 @@ for experiment in traceFilesByExperiment:
                                      ,cellDetails['classification']
                                      ,str(thisSegmentData['peakNoiseNeg'].item())
                                      ,str(thisSegmentData['peakNoisePos'].item())
+                                     ,str(thisSegmentData['mean_persistent_current'].item())
                                      ]) + '\n')
 
       # Draw the traces for this cell
