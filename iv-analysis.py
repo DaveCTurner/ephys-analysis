@@ -177,7 +177,7 @@ for experiment in traceFilesByExperiment:
         thisSegmentData['rmsNoise'] = sqrt(meanSquareNoise)
 
         # Only take the signal from tStart to tEnd and take out the estimated baseline
-        thisSegmentData['traceToDraw']    = selectTimeRange(signal, 0, tBaselineStart + tBaselineLength, tAnalyseTo)
+        thisSegmentData['traceToDraw']    = selectTimeRange(signal, 0, tBaselineStart + tBaselineLength, tPersistentFrom + tPersistentLength)
         toAnalyse                         = selectTimeRange(signal, 0, tAnalyseFrom,                     tAnalyseTo)
 
         # Find the peak index (number of samples), current and time
@@ -283,6 +283,7 @@ for experiment in traceFilesByExperiment:
           plt.setp(mark, color=thisSegmentColor)
 
       plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
+      plt.axvspan(tPersistentFrom, tPersistentFrom + tPersistentLength, facecolor='#ffc0c0', alpha=0.5)
       plt.grid()
       plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'iv-traces-' + cellDetails['filename'] + ".png"))
       plt.close()
