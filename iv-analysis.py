@@ -36,7 +36,7 @@ tPersistentFrom = 0.300  # Start measuring mean persistent current
 tPersistentLength   = 0.015  # Measure mean persistent current for this long
 
 # Open a results file with the date in the filename
-resultsDirectory = ephysutils.makeResultsDirectory()
+resultsDirectory = ephysutils.makeResultsDirectory('results')
 
 pertracefilename = os.path.join(resultsDirectory, 'results-per-trace.txt')
 print ("Writing per-trace results to", pertracefilename)

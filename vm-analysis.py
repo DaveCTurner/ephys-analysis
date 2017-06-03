@@ -27,7 +27,7 @@ traceFilesByExperiment = ephysutils.findTraceFiles(searchRoot = args.path, \
      cellDetailsByCell = ephysutils.loadCellDetails('cell-details.txt'))
 
 # Open a results file with the date in the filename
-resultsDirectory = ephysutils.makeResultsDirectory()
+resultsDirectory = ephysutils.makeResultsDirectory('results')
 
 pertracefilename = os.path.join(resultsDirectory, 'Vm-results.txt')
 pertracefile = open(pertracefilename, 'w')
@@ -58,7 +58,7 @@ for experiment in traceFilesByExperiment:
 
     for fileWithDetails in conditionFiles:
       cellDetails = fileWithDetails['details']
-      
+
       if cellDetails['classification'] == 'DISCARD':
         continue
 

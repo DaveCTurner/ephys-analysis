@@ -18,13 +18,14 @@ import ephysutils
 
 # Handle command-line arguments
 parser = argparse.ArgumentParser(description='IV analysis')
-parser.add_argument('path')
+parser.add_argument('--path',         required=True)
+parser.add_argument('--cell-details', required=True, dest='cellDetails')
+parser.add_argument('--results',      required=True)
 args = parser.parse_args()
 
 # Find trace files
 traceFilesByExperiment = ephysutils.findTraceFiles(searchRoot = args.path, \
-     cellDetailsByCell = ephysutils.loadCellDetails('cell-details.txt'))
-
+     cellDetailsByCell = ephysutils.loadCellDetails(args.cellDetails))
 
 # Define time points for the analysis
 tBaselineStart  = 0.245  # Start estimating the baseline from here
@@ -36,7 +37,7 @@ tPersistentFrom = 0.300  # Start measuring mean persistent current
 tPersistentLength   = 0.015  # Measure mean persistent current for this long
 
 # Open a results file with the date in the filename
-resultsDirectory = ephysutils.makeResultsDirectory()
+resultsDirectory = ephysutils.makeResultsDirectory(args.results)
 
 pertracefilename = os.path.join(resultsDirectory, 'results-per-trace.txt')
 print ("Writing per-trace results to", pertracefilename)

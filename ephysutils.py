@@ -37,10 +37,10 @@ def loadCellDetails(cellDetailsFilename):
 
   return cellDetailsByCell
 
-def makeResultsDirectory():
+def makeResultsDirectory(resultsFolderName):
   rundate = datetime.datetime.utcnow().replace(microsecond=0) \
                           .isoformat('-').replace(':','-')
-  dirname = os.path.join('results', rundate)
+  dirname = os.path.join(resultsFolderName, rundate)
   os.makedirs(dirname)
   return dirname
 
