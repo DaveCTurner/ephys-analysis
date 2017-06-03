@@ -80,7 +80,7 @@ for experiment in traceFilesByExperiment:
       cellDetails['vm_trace'] = signal
 
       if (signalCount == 0):
-        sumSignal = signal
+        sumSignal = signal * 1.0 # copy
         sumSignalSquared = signal * signal
       else:
         sumSignal += signal
