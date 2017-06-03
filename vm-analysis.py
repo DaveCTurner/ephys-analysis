@@ -64,7 +64,7 @@ for experiment in traceFilesByExperiment:
 
       sampleName = os.path.join(experiment, condition, cellDetails['filename'], cellDetails['classification'] or '')
 
-      print ("Analysing", sampleName)
+      print ("Analysing", sampleName, "from", fileWithDetails['filename'])
 
       reader = AxonIO(filename=fileWithDetails['filename'])
       blocks = reader.read()
