@@ -97,7 +97,7 @@ def selectTimeRange(signal, signalStartTime, selectionStartTime, selectionEndTim
   return signal[startIndex:endIndex]
 
 def voltageFromSegmentIndex(segmentIndex):
-  return pq.Quantity(5 * segmentIndex - 85, 'mV')
+  return pq.Quantity(5 * segmentIndex - 80, 'mV')
 
 def doNotProcess(cellDetails):
   return cellDetails['classification'] != 'SMALL' \
