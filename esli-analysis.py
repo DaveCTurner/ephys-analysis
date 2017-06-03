@@ -105,8 +105,7 @@ def voltageFromSegmentIndex(segmentIndex):
   return pq.Quantity(5 * segmentIndex - 80, 'mV')
 
 def doNotProcess(cellDetails):
-  return cellDetails['classification'] != 'SMALL' \
-     and cellDetails['classification'] != 'LARGE'
+  return False
 
 for experiment in traceFilesByExperiment:
   traceFilesByCondition = traceFilesByExperiment[experiment].get('ESL', None)
