@@ -109,7 +109,7 @@ def doNotProcess(cellDetails):
      and cellDetails['classification'] != 'LARGE'
 
 for experiment in traceFilesByExperiment:
-  traceFilesByCondition = traceFilesByExperiment[experiment].get('IV', None)
+  traceFilesByCondition = traceFilesByExperiment[experiment].get('ESL', None)
   if traceFilesByCondition == None:
     continue
 
