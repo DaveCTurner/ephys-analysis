@@ -65,6 +65,8 @@ pertracefile.write('\t'.join(['Path'
                              ,'Classification'
                              ,'Negative noise peak(pA)'
                              ,'Positive noise peak(pA)'
+                             ,'Mean persistent current(pA)'
+                             ,'Mean persistent current density (pA/pF)'
                              ]) + '\n')
 
 percellfilename = os.path.join(resultsDirectory, 'results-per-cell.txt')
