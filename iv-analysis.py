@@ -186,6 +186,9 @@ for experiment in traceFilesByExperiment:
         thisSegmentData['time_to_peak'] = minIndex * sample_time_sec + tAnalyseFrom
         thisSegmentData['peak_current_density'] = thisSegmentData['peak_current'] \
                                                 / cellDetails['whole_cell_capacitance']
+        thisSegmentData['persistent_current_density'] = thisSegmentData['mean_persistent_current'] \
+                                                / cellDetails['whole_cell_capacitance']
+
 
         thisSegmentData['mean_current']         = mean(toAnalyse)
         thisSegmentData['mean_current_density'] = thisSegmentData['mean_current'] \
