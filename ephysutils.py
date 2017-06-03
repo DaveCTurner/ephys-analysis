@@ -28,8 +28,8 @@ def loadCellDetails(cellDetailsFilename):
           , 'protocol':               cellDetailsRow['protocol']       \
           , 'freshness':              cellDetailsRow['freshness']      \
           , 'classification':         cellDetailsRow['classification'] \
-          , 'date':                   cellDetailsRow['date']           \
-          , 'notes':                  cellDetailsRow['notes']          \
+          , 'date':                   cellDetailsRow.get('date','')    \
+          , 'notes':                  cellDetailsRow.get('notes','')   \
           , 'experiment':             cellDetailsRow['experiment']     \
           , 'activation_voltage':     acVVal                           \
           , 'cell_identity':          cellDetailsRow['cell_identity']  \
