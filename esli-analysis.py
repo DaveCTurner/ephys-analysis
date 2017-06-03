@@ -217,8 +217,6 @@ for experiment in traceFilesByExperiment:
                                      ,cellDetails['cell_source']
                                      ,cellDetails['freshness']
                                      ,str(thisSegmentData['segmentIndex'])
-                                     ,str(thisSegmentData['voltage'].item())
-                                     ,str(thisSegmentData['driving_force'].item())
                                      ,str(thisSegmentData['time_to_peak'].item())
                                      ,str(thisSegmentData['peak_current'].item())
                                      ,str(thisSegmentData['mean_current'].item())
@@ -247,143 +245,14 @@ for experiment in traceFilesByExperiment:
                         thisSegmentData['traceToDraw'], linewidth=0.5, alpha=0.5)
         plt.setp(line, color=thisSegmentColor)
 
-        if thisSegmentData['peak_or_mean'] == 'peak':
-          mark = plt.plot(thisSegmentData['time_to_peak'], thisSegmentData['peak_current'], '+')
-          plt.setp(mark, color=thisSegmentColor)
+        mark = plt.plot(thisSegmentData['time_to_peak'], thisSegmentData['peak_current'], '+')
+        plt.setp(mark, color=thisSegmentColor)
 
       plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
       plt.axvspan(tPersistentFrom, tPersistentFrom + tPersistentLength, facecolor='#ffc0c0', alpha=0.5)
       plt.grid()
       plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'iv-traces-' + cellDetails['filename'] + ".png"))
       plt.close()
-
-      # Draw the IV curve for this cell
-      figure = plt.figure(figsize=(20,10), dpi=80)
-      plt.title(sampleName)
-      plt.xlabel('Voltage (mV)')
-      plt.ylabel('Current density (pA/pF)')
-
-      xData = []
-      yData = []
-      for thisSegmentData in cellDetails['segments']:
-        xData.append(thisSegmentData['voltage'])
-        yData.append(thisSegmentData['peak_current_density'])
-
-      line = plt.plot(xData, yData, linewidth=0.5, zorder=0)
-      plt.setp(line, color='#ff0000')
-
-      xData = []
-      yData = []
-      for thisSegmentData in cellDetails['segments']:
-        xData.append(thisSegmentData['voltage'])
-        yData.append(thisSegmentData['mean_current_density'])
-
-      line = plt.plot(xData, yData, linewidth=0.5, zorder=0)
-      plt.setp(line, color='#00ff00')
-
-
-      xData = []
-      yData = []
-      for thisSegmentData in cellDetails['segments']:
-        xData.append(thisSegmentData['voltage'])
-        yData.append(thisSegmentData['selected_current_density'])
-
-      line = plt.plot(xData, yData, linewidth=1, zorder=1)
-      plt.setp(line, color='#000000')
-
-      plt.grid()
-      plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'current-density-' + cellDetails['filename'] + '.png'))
-      plt.close()
-
-    # Draw the IV curves for all cells in this condition, using peak current
-    figure = plt.figure(figsize=(20,10), dpi=80)
-    plt.title(os.path.join(experiment, condition))
-    plt.xlabel('Voltage (mV)')
-    plt.ylabel('Peak current density (pA/pF)')
-
-    cellCount          = 0
-    runningTotal       = np.zeros(segment_count)
-    runningSquareTotal = np.zeros(segment_count)
-
-    for fileWithDetails in conditionFiles:
-      filename    = fileWithDetails['filename']
-      cellDetails = fileWithDetails['details']
-      if doNotProcess(cellDetails):
-        continue
-
-      xData = []
-      yData = []
-      for thisSegmentData in cellDetails['segments']:
-        xData.append(thisSegmentData['voltage'])
-        yData.append(thisSegmentData['peak_current_density'])
-
-      line = plt.plot(xData, yData, zorder=1)
-      plt.setp(line, color='#c0c0c0')
-
-      yData = np.array(yData)
-      runningTotal       += yData
-      runningSquareTotal += yData * yData
-      cellCount          += 1
-
-    if cellCount > 0:
-      means     = runningTotal / cellCount
-      variances = runningSquareTotal / cellCount - means * means
-      stderrs   = [sqrt(var) / sqrt(cellCount)
-                  for var in variances]
-
-      plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
-
-    if (conditionActivationVoltage is not None):
-      plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
-
-    plt.grid()
-    plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'peak-current-density-all.png'))
-    plt.close()
-
-    # Draw the IV curves for all cells in this condition, using selected current (peak/mean)
-    figure = plt.figure(figsize=(20,10), dpi=80)
-    plt.title(os.path.join(experiment, condition))
-    plt.xlabel('Voltage (mV)')
-    plt.ylabel('Current density (pA/pF)')
-
-    cellCount          = 0
-    runningTotal       = np.zeros(segment_count)
-    runningSquareTotal = np.zeros(segment_count)
-
-    for fileWithDetails in conditionFiles:
-      filename    = fileWithDetails['filename']
-      cellDetails = fileWithDetails['details']
-      if doNotProcess(cellDetails):
-        continue
-
-      xData = []
-      yData = []
-      for thisSegmentData in cellDetails['segments']:
-        xData.append(thisSegmentData['voltage'])
-        yData.append(thisSegmentData['selected_current_density'])
-
-      line = plt.plot(xData, yData, zorder=1)
-      plt.setp(line, color='#c0c0c0')
-
-      yData = np.array(yData)
-      runningTotal       += yData
-      runningSquareTotal += yData * yData
-      cellCount          += 1
-
-    if cellCount > 0:
-      means     = runningTotal / cellCount
-      variances = runningSquareTotal / cellCount - means * means
-      stderrs   = [sqrt(var) / sqrt(cellCount)
-                  for var in variances]
-
-      plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
-
-    if (conditionActivationVoltage is not None):
-      plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
-
-    plt.grid()
-    plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'selected-current-density-all.png'))
-    plt.close()
 
 pertracefile.close()
 percellfile.close()
