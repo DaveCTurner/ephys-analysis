@@ -132,6 +132,7 @@ for experiment in traceFilesByExperiment:
       perCellRunningTotalP2PNoise = 0
       perCellRunningTotalRMSNoise = 0
 
+      cellDetails['mean_current_trace'] = None
       cellDetails['segments'] = []
       for segmentIndex in range(segment_count):
 
@@ -167,6 +168,11 @@ for experiment in traceFilesByExperiment:
         # Only take the signal from tStart to tEnd and take out the estimated baseline
         thisSegmentData['traceToDraw']    = selectTimeRange(signal, 0, tBaselineStart + tBaselineLength, tPersistentFrom + tPersistentLength)
         toAnalyse                         = selectTimeRange(signal, 0, tAnalyseFrom,                     tAnalyseTo)
+
+        if (cellDetails['mean_current_trace'] is None):
+          cellDetails['mean_current_trace'] = thisSegmentData['traceToDraw'] / segment_count # copy
+        else:
+          cellDetails['mean_current_trace'] += thisSegmentData['traceToDraw'] / segment_count
 
         # Find the peak index (number of samples), current and time
         minIndex   = argmin(toAnalyse)
@@ -247,6 +253,11 @@ for experiment in traceFilesByExperiment:
 
         mark = plt.plot(thisSegmentData['time_to_peak'], thisSegmentData['peak_current'], '+')
         plt.setp(mark, color=thisSegmentColor)
+
+      line = plt.plot([tBaselineStart + tBaselineLength + sample_index * sample_time_sec
+                          for sample_index in range(len(cellDetails['mean_current_trace']))],
+                      cellDetails['mean_current_trace'], linewidth=1.0, alpha=1.0)
+      plt.setp(line, color='#000000')
 
       plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
       plt.axvspan(tPersistentFrom, tPersistentFrom + tPersistentLength, facecolor='#ffc0c0', alpha=0.5)
