@@ -33,8 +33,8 @@ tBaselineLength = 0.01   # Estimate the baseline for this long
 tEnd            = 0.268  # End the graph
 tAnalyseFrom    = 0.2553 # Look for peaks after this time
 tAnalyseTo      = 0.263  # Look for peaks before this time
-tPersistentFrom = 0.300  # Start measuring mean persistent current
-tPersistentLength   = 0.015  # Measure mean persistent current for this long
+tPersistentFrom = 0.290  # Start measuring mean persistent current
+tPersistentLength   = 0.010  # Measure mean persistent current for this long
 
 # Open a results file with the date in the filename
 resultsDirectory = ephysutils.makeResultsDirectory(args.results)
