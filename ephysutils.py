@@ -30,6 +30,7 @@ def loadCellDetails(cellDetailsFilename):
           , 'classification':         cellDetailsRow['classification'] \
           , 'date':                   cellDetailsRow.get('date','')    \
           , 'notes':                  cellDetailsRow.get('notes','')   \
+          , 'when':                   cellDetailsRow.get('when','')    \
           , 'experiment':             cellDetailsRow['experiment']     \
           , 'activation_voltage':     acVVal                           \
           , 'cell_identity':          cellDetailsRow['cell_identity']  \
