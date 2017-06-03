@@ -91,10 +91,6 @@ percellfile.write('\t'.join(['Path'
 # These traces were done at 50 kHz (see assertion below)
 sample_frequency = pq.Quantity(50000.0, 'Hz')
 sample_time_sec = (pq.Quantity(1.0, 'Hz') / sample_frequency).item()
-segment_count   = 23
-
-# Define colour map for traces 1..23 using 'winter' colour scale (green to blue)
-colormap = cm.ScalarMappable(norm=mpl.colors.Normalize(vmin=1, vmax=segment_count), cmap=cm.get_cmap('winter'))
 
 def selectTimeRange(signal, signalStartTime, selectionStartTime, selectionEndTime):
   startIndex = round((selectionStartTime - signalStartTime) / sample_time_sec)
@@ -135,7 +131,7 @@ for experiment in traceFilesByExperiment:
       blocks = reader.read()
 
       assert len(blocks) == 1
-      assert len(blocks[0].segments) == segment_count
+      segment_count = len(blocks[0].segments)
 
       # Per-cell statistics
       perCellMinPeakSoFar         = pq.Quantity(0, 'pA')
@@ -274,7 +270,7 @@ for experiment in traceFilesByExperiment:
       axes.set_ylim([-670,100])
 
       for thisSegmentData in cellDetails['segments']:
-        thisSegmentColor = colormap.to_rgba(segment_count - thisSegmentData['segmentIndex'])
+        thisSegmentColor = '#808080'
 
         line = plt.plot([tBaselineStart + tBaselineLength + sample_index * sample_time_sec
                             for sample_index in range(len(thisSegmentData['traceToDraw']))],
