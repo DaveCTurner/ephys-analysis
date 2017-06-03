@@ -19,15 +19,17 @@ import os
 
 # Handle command-line arguments
 parser = argparse.ArgumentParser(description='Vm analysis')
-parser.add_argument('path')
+parser.add_argument('--path',         required=True)
+parser.add_argument('--cell-details', required=True, dest='cellDetails')
+parser.add_argument('--results',      required=True)
 args = parser.parse_args()
 
 # Find trace files
 traceFilesByExperiment = ephysutils.findTraceFiles(searchRoot = args.path, \
-     cellDetailsByCell = ephysutils.loadCellDetails('cell-details.txt'))
+     cellDetailsByCell = ephysutils.loadCellDetails(args.cellDetails))
 
 # Open a results file with the date in the filename
-resultsDirectory = ephysutils.makeResultsDirectory('results')
+resultsDirectory = ephysutils.makeResultsDirectory(args.results)
 
 pertracefilename = os.path.join(resultsDirectory, 'Vm-results.txt')
 pertracefile = open(pertracefilename, 'w')
