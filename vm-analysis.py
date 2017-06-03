@@ -106,7 +106,7 @@ for experiment in traceFilesByExperiment:
     plt.xlabel('Time (s)')
     plt.ylabel('Vm (mV)')
     axes = plt.gca()
-    axes.set_ylim([-180,15])
+    axes.set_ylim([-90,15])
 
     for fileWithDetails in conditionFiles:
       cellDetails = fileWithDetails['details']
@@ -137,7 +137,7 @@ for experiment in traceFilesByExperiment:
       plt.xlabel('Time (s)')
       plt.ylabel('Vm (mV)')
       axes = plt.gca()
-      axes.set_ylim([-400,15])
+      axes.set_ylim([-90,15])
 
       signal = details['vm_trace']
 
