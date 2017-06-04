@@ -264,6 +264,7 @@ for experiment in traceFilesByExperiment:
                                      ,str(thisSegmentData['peakNoiseNeg'].item())
                                      ,str(thisSegmentData['peakNoisePos'].item())
                                      ,str(thisSegmentData['mean_persistent_current'].item())
+                                     ,str(thisSegmentData['persistent_current_density'].item())
                                      ]) + '\n')
 
       # Draw the traces for this cell
