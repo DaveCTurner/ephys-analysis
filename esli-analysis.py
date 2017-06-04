@@ -47,12 +47,7 @@ pertracefile.write('\t'.join(['Path'
                              ,'Cell source'
                              ,'Freshness'
                              ,'Segment number'
-                             ,'Time to peak (s)'
-                             ,'I_min(pA)'
-                             ,'I_mean(pA)'
                              ,'WCC (pF)'
-                             ,'Peak current density(pA/pF)'
-                             ,'Mean current density(pA/pF)'
                              ,'Classification'
                              ,'Negative noise peak(pA)'
                              ,'Positive noise peak(pA)'
@@ -71,10 +66,12 @@ percellfile.write('\t'.join(['Path'
                             ,'Total segments'
                             ,'Segments analysed'
                             ,'WCC (pF)'
-                            ,'Best peak (pA)'
                             ,'Mean RMS noise (pA)'
                             ,'Mean P2P noise'
                             ,'Classification'
+                            ,'Time to peak (s)'
+                            ,'Peak current (pA)'
+                            ,'Peak current density (pA/pF)'
                             ]) + '\n')
 
 # These traces were done at 50 kHz (see assertion below)
@@ -123,7 +120,6 @@ for experiment in traceFilesByExperiment:
         segment_count = 18
 
       # Per-cell statistics
-      perCellMinPeakSoFar         = pq.Quantity(0, 'pA')
       perCellRunningTotalP2PNoise = 0
       perCellRunningTotalRMSNoise = 0
 
@@ -165,24 +161,16 @@ for experiment in traceFilesByExperiment:
         else:
           cellDetails['mean_current_trace'] += thisSegmentData['traceToDraw'] / segment_count
 
-        # Find the peak index (number of samples), current and time
-        minIndex   = argmin(toAnalyse)
-        thisSegmentData['peak_current'] = toAnalyse[minIndex]
-        thisSegmentData['time_to_peak'] = minIndex * sample_time_sec + tAnalyseFrom
-        thisSegmentData['peak_current_density'] = thisSegmentData['peak_current'] \
-                                                / cellDetails['whole_cell_capacitance']
-
-        thisSegmentData['mean_current']         = mean(toAnalyse)
-        thisSegmentData['mean_current_density'] = thisSegmentData['mean_current'] \
-                                                / cellDetails['whole_cell_capacitance']
-
-        if (thisSegmentData['peak_current'] < perCellMinPeakSoFar):
-          perCellMinPeakSoFar = thisSegmentData['peak_current']
-
         perCellRunningTotalP2PNoise += thisSegmentData['peakNoisePos'].item() - thisSegmentData['peakNoiseNeg'].item()
         perCellRunningTotalRMSNoise += thisSegmentData['rmsNoise']
 
-      cellDetails['min_peak_current'] = perCellMinPeakSoFar
+      # Find the peak index (number of samples), current and time
+      minIndex   = argmin(cellDetails['mean_current_trace'])
+      cellDetails['peak_current'] = cellDetails['mean_current_trace'][minIndex]
+      cellDetails['time_to_peak'] = minIndex * sample_time_sec + tBaselineStart + tBaselineLength
+      cellDetails['peak_current_density'] = cellDetails['peak_current'] \
+                                          / cellDetails['whole_cell_capacitance']
+
       cellDetails['mean_p2p_noise']   = perCellRunningTotalP2PNoise / segment_count
       cellDetails['mean_rms_noise']   = perCellRunningTotalRMSNoise / segment_count
 
@@ -197,10 +185,12 @@ for experiment in traceFilesByExperiment:
                                   ,str(cellDetails['actual_segment_count'])
                                   ,str(len(cellDetails['segments']))
                                   ,str(cellDetails['whole_cell_capacitance'].item())
-                                  ,str(cellDetails['min_peak_current'].item())
                                   ,str(cellDetails['mean_rms_noise'])
                                   ,str(cellDetails['mean_p2p_noise'])
                                   ,cellDetails['classification']
+                                  ,str(cellDetails['time_to_peak'].item())
+                                  ,str(cellDetails['peak_current'].item())
+                                  ,str(cellDetails['peak_current_density'].item())
                                   ]) + '\n')
 
       # Write the per-trace results
@@ -212,12 +202,7 @@ for experiment in traceFilesByExperiment:
                                      ,cellDetails['cell_source']
                                      ,cellDetails['freshness']
                                      ,str(thisSegmentData['segmentIndex'])
-                                     ,str(thisSegmentData['time_to_peak'].item())
-                                     ,str(thisSegmentData['peak_current'].item())
-                                     ,str(thisSegmentData['mean_current'].item())
                                      ,str(cellDetails['whole_cell_capacitance'].item())
-                                     ,str(thisSegmentData['peak_current_density'].item())
-                                     ,str(thisSegmentData['mean_current_density'].item())
                                      ,cellDetails['classification']
                                      ,str(thisSegmentData['peakNoiseNeg'].item())
                                      ,str(thisSegmentData['peakNoisePos'].item())
@@ -239,13 +224,13 @@ for experiment in traceFilesByExperiment:
                         thisSegmentData['traceToDraw'], linewidth=0.5, alpha=0.5)
         plt.setp(line, color=thisSegmentColor)
 
-        mark = plt.plot(thisSegmentData['time_to_peak'], thisSegmentData['peak_current'], '+')
-        plt.setp(mark, color=thisSegmentColor)
-
       line = plt.plot([tBaselineStart + tBaselineLength + sample_index * sample_time_sec
                           for sample_index in range(len(cellDetails['mean_current_trace']))],
                       cellDetails['mean_current_trace'], linewidth=1.0, alpha=1.0)
       plt.setp(line, color='#000000')
+
+      mark = plt.plot(cellDetails['time_to_peak'], cellDetails['peak_current'], '+')
+      plt.setp(mark, color='#000000')
 
       plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
       plt.grid()
