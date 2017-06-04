@@ -68,6 +68,7 @@ percellfile.write('\t'.join(['Path'
                             ,'WCC (pF)'
                             ,'Mean RMS noise (pA)'
                             ,'Mean P2P noise'
+                            ,'When'
                             ,'Classification'
                             ,'Time to peak (s)'
                             ,'Peak current (pA)'
@@ -187,6 +188,7 @@ for experiment in traceFilesByExperiment:
                                   ,str(cellDetails['whole_cell_capacitance'].item())
                                   ,str(cellDetails['mean_rms_noise'])
                                   ,str(cellDetails['mean_p2p_noise'])
+                                  ,cellDetails['when']
                                   ,cellDetails['classification']
                                   ,str(cellDetails['time_to_peak'].item())
                                   ,str(cellDetails['peak_current'].item())
