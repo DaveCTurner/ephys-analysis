@@ -68,7 +68,8 @@ percellfile.write('\t'.join(['Path'
                             ,'Cell source'
                             ,'Freshness'
                             ,'Cell identity'
-                            ,'Segments'
+                            ,'Total segments'
+                            ,'Segments analysed'
                             ,'WCC (pF)'
                             ,'Best peak (pA)'
                             ,'Mean RMS noise (pA)'
@@ -117,6 +118,7 @@ for experiment in traceFilesByExperiment:
 
       assert len(blocks) == 1
       segment_count = len(blocks[0].segments)
+      cellDetails['actual_segment_count'] = segment_count
       if segment_count > 18:
         segment_count = 18
 
@@ -192,6 +194,7 @@ for experiment in traceFilesByExperiment:
                                   ,cellDetails['cell_source']
                                   ,cellDetails['freshness']
                                   ,cellDetails['cell_identity']
+                                  ,str(cellDetails['actual_segment_count'])
                                   ,str(len(cellDetails['segments']))
                                   ,str(cellDetails['whole_cell_capacitance'].item())
                                   ,str(cellDetails['min_peak_current'].item())
