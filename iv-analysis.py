@@ -48,6 +48,7 @@ pertracefile.write('\t'.join(['Path'
                              ,'Cell line'
                              ,'Cell source'
                              ,'Freshness'
+                             ,'Cell identity'
                              ,'Segment number'
                              ,'Voltage(mV)'
                              ,'Use peak or mean'
@@ -245,6 +246,7 @@ for experiment in traceFilesByExperiment:
                                      ,cellDetails['cell_line']
                                      ,cellDetails['cell_source']
                                      ,cellDetails['freshness']
+                                     ,cellDetails['cell_identity']
                                      ,str(thisSegmentData['segmentIndex'])
                                      ,str(thisSegmentData['voltage'].item())
                                      ,thisSegmentData['peak_or_mean']
