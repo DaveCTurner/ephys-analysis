@@ -33,8 +33,6 @@ tBaselineLength = 0.01   # Estimate the baseline for this long
 tEnd            = 0.268  # End the graph
 tAnalyseFrom    = 0.2553 # Look for peaks after this time
 tAnalyseTo      = 0.263  # Look for peaks before this time
-tPersistentFrom = 0.290  # Start measuring mean persistent current
-tPersistentLength   = 0.010  # Measure mean persistent current for this long
 
 # Open a results file with the date in the filename
 resultsDirectory = ephysutils.makeResultsDirectory(args.results)
@@ -58,7 +56,6 @@ pertracefile.write('\t'.join(['Path'
                              ,'Classification'
                              ,'Negative noise peak(pA)'
                              ,'Positive noise peak(pA)'
-                             ,'Mean persistent current(pA)'
                              ]) + '\n')
 
 percellfilename = os.path.join(resultsDirectory, 'results-per-cell.txt')
@@ -147,10 +144,6 @@ for experiment in traceFilesByExperiment:
         baseline                     = mean(quiescentSignalWithoutOffset)
         signal                       = signal - baseline
 
-        # Calculate the mean persistent current
-        persistentCurrent            = selectTimeRange(signal, 0, tPersistentFrom, tPersistentFrom + tPersistentLength)
-        thisSegmentData['mean_persistent_current'] = mean(persistentCurrent)
-
         # Analyse the noise from the quiescent signal (after applying the offset)
         quiescentSignal = quiescentSignalWithoutOffset - baseline
         thisSegmentData['peakNoiseNeg'] = min(quiescentSignal)
@@ -160,7 +153,7 @@ for experiment in traceFilesByExperiment:
         thisSegmentData['rmsNoise'] = sqrt(meanSquareNoise)
 
         # Only take the signal from tStart to tEnd and take out the estimated baseline
-        thisSegmentData['traceToDraw']    = selectTimeRange(signal, 0, tBaselineStart + tBaselineLength, tPersistentFrom + tPersistentLength)
+        thisSegmentData['traceToDraw']    = selectTimeRange(signal, 0, tBaselineStart + tBaselineLength, tAnalyseTo)
         toAnalyse                         = selectTimeRange(signal, 0, tAnalyseFrom,                     tAnalyseTo)
 
         if (cellDetails['mean_current_trace'] is None):
@@ -174,9 +167,6 @@ for experiment in traceFilesByExperiment:
         thisSegmentData['time_to_peak'] = minIndex * sample_time_sec + tAnalyseFrom
         thisSegmentData['peak_current_density'] = thisSegmentData['peak_current'] \
                                                 / cellDetails['whole_cell_capacitance']
-        thisSegmentData['persistent_current_density'] = thisSegmentData['mean_persistent_current'] \
-                                                / cellDetails['whole_cell_capacitance']
-
 
         thisSegmentData['mean_current']         = mean(toAnalyse)
         thisSegmentData['mean_current_density'] = thisSegmentData['mean_current'] \
@@ -226,7 +216,6 @@ for experiment in traceFilesByExperiment:
                                      ,cellDetails['classification']
                                      ,str(thisSegmentData['peakNoiseNeg'].item())
                                      ,str(thisSegmentData['peakNoisePos'].item())
-                                     ,str(thisSegmentData['mean_persistent_current'].item())
                                      ]) + '\n')
 
       # Draw the traces for this cell
@@ -254,7 +243,6 @@ for experiment in traceFilesByExperiment:
       plt.setp(line, color='#000000')
 
       plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
-      plt.axvspan(tPersistentFrom, tPersistentFrom + tPersistentLength, facecolor='#ffc0c0', alpha=0.5)
       plt.grid()
       plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'iv-traces-' + cellDetails['filename'] + ".png"))
       plt.close()
