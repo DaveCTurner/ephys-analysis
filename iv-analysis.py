@@ -49,6 +49,7 @@ pertracefile.write('\t'.join(['Path'
                              ,'Cell source'
                              ,'Freshness'
                              ,'Cell identity'
+                             ,'When'
                              ,'Segment number'
                              ,'Voltage(mV)'
                              ,'Use peak or mean'
@@ -81,6 +82,7 @@ percellfile.write('\t'.join(['Path'
                             ,'Cell source'
                             ,'Freshness'
                             ,'Cell identity'
+                            ,'When'
                             ,'WCC (pF)'
                             ,'Best peak (pA)'
                             ,'Mean RMS noise (pA)'
@@ -230,6 +232,7 @@ for experiment in traceFilesByExperiment:
                                   ,cellDetails['cell_source']
                                   ,cellDetails['freshness']
                                   ,cellDetails['cell_identity']
+                                  ,cellDetails['when']
                                   ,str(cellDetails['whole_cell_capacitance'].item())
                                   ,str(cellDetails['min_peak_current'].item())
                                   ,str(cellDetails['mean_rms_noise'])
@@ -247,6 +250,7 @@ for experiment in traceFilesByExperiment:
                                      ,cellDetails['cell_source']
                                      ,cellDetails['freshness']
                                      ,cellDetails['cell_identity']
+                                     ,cellDetails['when']
                                      ,str(thisSegmentData['segmentIndex'])
                                      ,str(thisSegmentData['voltage'].item())
                                      ,thisSegmentData['peak_or_mean']
