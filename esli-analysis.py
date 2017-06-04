@@ -117,6 +117,8 @@ for experiment in traceFilesByExperiment:
 
       assert len(blocks) == 1
       segment_count = len(blocks[0].segments)
+      if segment_count > 18:
+        segment_count = 18
 
       # Per-cell statistics
       perCellMinPeakSoFar         = pq.Quantity(0, 'pA')
