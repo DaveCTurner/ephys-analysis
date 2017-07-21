@@ -94,7 +94,7 @@ for experiment in traceFilesByExperiment:
 
   for condition in traceFilesByCondition:
     os.makedirs(os.path.join(resultsDirectory, experiment, condition))
-    conditionActivationVoltage = None
+
     conditionFiles = traceFilesByCondition[condition]['files']
 
     for fileWithDetails in conditionFiles:
@@ -105,10 +105,7 @@ for experiment in traceFilesByExperiment:
 
       print ("Analysing", sampleName)
 
-      if conditionActivationVoltage is not None:
-          assert(conditionActivationVoltage == cellDetails['activation_voltage'])
 
-      conditionActivationVoltage = cellDetails['activation_voltage']
 
       # Read the file into 'blocks'
       reader = AxonIO(filename=filename)
