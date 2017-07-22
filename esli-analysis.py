@@ -33,6 +33,8 @@ tBaselineLength = 0.01   # Estimate the baseline for this long
 tEnd            = 0.268  # End the graph
 tAnalyseFrom    = 0.2553 # Look for peaks after this time
 tAnalyseTo      = 0.263  # Look for peaks before this time
+tPersistentFrom = 0.290  # Measure mean persistent current from here
+tPersistentTo   = 0.300  # Measure mean persistent current to here
 
 # Open a results file with the date in the filename
 resultsDirectory = ephysutils.makeResultsDirectory(args.results)
@@ -73,6 +75,8 @@ percellfile.write('\t'.join(['Path'
                             ,'Time to peak (s)'
                             ,'Peak current (pA)'
                             ,'Peak current density (pA/pF)'
+                            ,'Persistent current (pA)'
+                            ,'Persistent current density (pA/pF)'
                             ]) + '\n')
 
 # These traces were done at 50 kHz (see assertion below)
@@ -94,7 +98,7 @@ for experiment in traceFilesByExperiment:
 
   for condition in traceFilesByCondition:
     os.makedirs(os.path.join(resultsDirectory, experiment, condition))
-
+    
     conditionFiles = traceFilesByCondition[condition]['files']
 
     for fileWithDetails in conditionFiles:
@@ -105,7 +109,7 @@ for experiment in traceFilesByExperiment:
 
       print ("Analysing", sampleName)
 
-
+     
 
       # Read the file into 'blocks'
       reader = AxonIO(filename=filename)
@@ -114,14 +118,14 @@ for experiment in traceFilesByExperiment:
       assert len(blocks) == 1
       segment_count = len(blocks[0].segments)
       cellDetails['actual_segment_count'] = segment_count
-      if segment_count > 18:
-        segment_count = 18
+      assert(segment_count == 20)
 
       # Per-cell statistics
       perCellRunningTotalP2PNoise = 0
       perCellRunningTotalRMSNoise = 0
 
-      cellDetails['mean_current_trace'] = None
+      cellDetails['mean_current_trace']            = None
+      cellDetails['mean_persistent_current_trace'] = None
       cellDetails['segments'] = []
       for segmentIndex in range(segment_count):
 
@@ -159,10 +163,16 @@ for experiment in traceFilesByExperiment:
         else:
           cellDetails['mean_current_trace'] += thisSegmentData['traceToDraw'] / segment_count
 
+        persistent_current_signal = selectTimeRange(signal, 0, tPersistentFrom, tPersistentTo)
+        if (cellDetails['mean_persistent_current_trace'] is None):
+          cellDetails['mean_persistent_current_trace'] = persistent_current_signal / segment_count # copy
+        else:
+          cellDetails['mean_persistent_current_trace'] += persistent_current_signal / segment_count
+
         perCellRunningTotalP2PNoise += thisSegmentData['peakNoisePos'].item() - thisSegmentData['peakNoiseNeg'].item()
         perCellRunningTotalRMSNoise += thisSegmentData['rmsNoise']
-
-      # Find the peak index (number of samples), current and time
+        
+      # Find the peak index (number of samples in), current and time
       minIndex   = argmin(cellDetails['mean_current_trace'])
       cellDetails['peak_current'] = cellDetails['mean_current_trace'][minIndex]
       cellDetails['time_to_peak'] = minIndex * sample_time_sec + tBaselineStart + tBaselineLength
@@ -171,6 +181,7 @@ for experiment in traceFilesByExperiment:
 
       cellDetails['mean_p2p_noise']   = perCellRunningTotalP2PNoise / segment_count
       cellDetails['mean_rms_noise']   = perCellRunningTotalRMSNoise / segment_count
+      cellDetails['persistent_current'] = mean(cellDetails['mean_persistent_current_trace'])
 
       # Write the per-cell results
       percellfile.write('\t'.join([cellDetails['path']
@@ -190,6 +201,7 @@ for experiment in traceFilesByExperiment:
                                   ,str(cellDetails['time_to_peak'].item())
                                   ,str(cellDetails['peak_current'].item())
                                   ,str(cellDetails['peak_current_density'].item())
+                                  ,str(cellDetails['persistent_current'].item())
                                   ]) + '\n')
 
       # Write the per-trace results

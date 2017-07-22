@@ -18,6 +18,9 @@ def loadCellDetails(cellDetailsFilename):
 
         acVString = cellDetailsRow['activation_voltage']
         acVVal    = pq.Quantity(float(acVString), 'mV') if acVString else None
+        
+        inacVString = cellDetailsRow['inactivation_voltage']
+        inacVVal    = pq.Quantity(float(acVString), 'mV') if inacVString else None
 
         cellDetailsByCell[cellDetailsRow['filename']] = \
           { 'filename':               cellDetailsRow['filename']       \
@@ -33,6 +36,7 @@ def loadCellDetails(cellDetailsFilename):
           , 'when':                   cellDetailsRow.get('when','')    \
           , 'experiment':             cellDetailsRow['experiment']     \
           , 'activation_voltage':     acVVal                           \
+          , 'inactivation_voltage':   inacVVal                         \
           , 'cell_identity':          cellDetailsRow['cell_identity']  \
           }
 

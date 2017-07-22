@@ -33,7 +33,7 @@ tBaselineLength = 0.01   # Estimate the baseline for this long
 tEnd            = 0.268  # End the graph
 tAnalyseFrom    = 0.2557 # Look for peaks after this time
 tAnalyseTo      = 0.263  # Look for peaks before this time
-tPersistentFrom = 0.300  # Start measuring mean persistent current
+tPersistentFrom = 0.285  # Start measuring mean persistent current
 tPersistentLength   = 0.015  # Measure mean persistent current for this long
 
 # Open a results file with the date in the filename
@@ -118,7 +118,6 @@ for experiment in traceFilesByExperiment:
 
   for condition in traceFilesByCondition:
     os.makedirs(os.path.join(resultsDirectory, experiment, condition))
-    conditionActivationVoltage = None
     conditionFiles = traceFilesByCondition[condition]['files']
 
     for fileWithDetails in conditionFiles:
@@ -129,10 +128,7 @@ for experiment in traceFilesByExperiment:
 
       print ("Analysing", sampleName)
 
-      if conditionActivationVoltage is not None:
-          assert(conditionActivationVoltage == cellDetails['activation_voltage'])
 
-      conditionActivationVoltage = cellDetails['activation_voltage']
 
       # Read the file into 'blocks'
       reader = AxonIO(filename=filename)
@@ -203,7 +199,8 @@ for experiment in traceFilesByExperiment:
         thisSegmentData['conductance']   = thisSegmentData['peak_current_density'] \
                                          / thisSegmentData['driving_force']
 
-        thisSegmentData['peak_or_mean'] = 'mean' if thisSegmentData['voltage'] <= conditionActivationVoltage else 'peak'
+        thisSegmentData['peak_or_mean'] = 'mean' if thisSegmentData['voltage'] <= cellDetails['activation_voltage'] else 'peak'
+ 
         thisSegmentData['selected_current']         = thisSegmentData[thisSegmentData['peak_or_mean'] + '_current']
         thisSegmentData['selected_current_density'] = thisSegmentData[thisSegmentData['peak_or_mean'] + '_current_density']
 
@@ -394,8 +391,7 @@ for experiment in traceFilesByExperiment:
 
       plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
 
-    if (conditionActivationVoltage is not None):
-      plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
+
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'peak-current-density-all.png'))
@@ -439,8 +435,7 @@ for experiment in traceFilesByExperiment:
 
       plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
 
-    if (conditionActivationVoltage is not None):
-      plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
+  
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'selected-current-density-all.png'))
@@ -484,8 +479,7 @@ for experiment in traceFilesByExperiment:
 
       plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
 
-    if (conditionActivationVoltage is not None):
-      plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
+    
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'normalised-conductance-all.png'))
