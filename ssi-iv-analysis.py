@@ -118,7 +118,6 @@ for experiment in traceFilesByExperiment:
 
   for condition in traceFilesByCondition:
     os.makedirs(os.path.join(resultsDirectory, experiment, condition))
-    conditionActivationVoltage = None
     conditionFiles = traceFilesByCondition[condition]['files']
 
     for fileWithDetails in conditionFiles:
@@ -129,10 +128,7 @@ for experiment in traceFilesByExperiment:
 
       print ("Analysing", sampleName)
 
-      if conditionActivationVoltage is not None:
-          assert(conditionActivationVoltage == cellDetails['activation_voltage'])
 
-      conditionActivationVoltage = cellDetails['activation_voltage']
 
       # Read the file into 'blocks'
       reader = AxonIO(filename=filename)
@@ -394,8 +390,7 @@ for experiment in traceFilesByExperiment:
 
       plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
 
-    if (conditionActivationVoltage is not None):
-      plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
+
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'peak-current-density-all.png'))
@@ -439,8 +434,7 @@ for experiment in traceFilesByExperiment:
 
       plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
 
-    if (conditionActivationVoltage is not None):
-      plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
+  
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'selected-current-density-all.png'))
@@ -484,8 +478,7 @@ for experiment in traceFilesByExperiment:
 
       plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
 
-    if (conditionActivationVoltage is not None):
-      plt.axvspan(-90, conditionActivationVoltage + pq.Quantity(2.5, 'mV'), facecolor='#c0c0c0', alpha=0.5)
+    
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'normalised-conductance-all.png'))
