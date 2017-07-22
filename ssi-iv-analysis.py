@@ -434,7 +434,7 @@ for experiment in traceFilesByExperiment:
 
       plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
 
-  
+
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'selected-current-density-all.png'))
@@ -478,7 +478,7 @@ for experiment in traceFilesByExperiment:
 
       plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
 
-    
+
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'normalised-conductance-all.png'))
