@@ -164,10 +164,6 @@ for experiment in traceFilesByExperiment:
         baseline                     = mean(quiescentSignalWithoutOffset)
         signal                       = signal - baseline
 
-        # Calculate the mean persistent current
-        persistentCurrent            = selectTimeRange(signal, 0, tPersistentFrom, tPersistentFrom + tPersistentLength)
-        thisSegmentData['mean_persistent_current'] = mean(persistentCurrent)
-
         # Analyse the noise from the quiescent signal (after applying the offset)
         quiescentSignal = quiescentSignalWithoutOffset - baseline
         thisSegmentData['peakNoiseNeg'] = min(quiescentSignal)
@@ -266,8 +262,6 @@ for experiment in traceFilesByExperiment:
                                      ,cellDetails['classification']
                                      ,str(thisSegmentData['peakNoiseNeg'].item())
                                      ,str(thisSegmentData['peakNoisePos'].item())
-                                     ,str(thisSegmentData['mean_persistent_current'].item())
-                                     ,str(thisSegmentData['persistent_current_density'].item())
                                      ]) + '\n')
 
       # Draw the traces for this cell
@@ -291,7 +285,6 @@ for experiment in traceFilesByExperiment:
           plt.setp(mark, color=thisSegmentColor)
 
       plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
-      plt.axvspan(tPersistentFrom, tPersistentFrom + tPersistentLength, facecolor='#ffc0c0', alpha=0.5)
       plt.grid()
       plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'iv-traces-' + cellDetails['filename'] + ".png"))
       plt.close()
@@ -478,8 +471,6 @@ for experiment in traceFilesByExperiment:
                   for var in variances]
 
       plt.errorbar(xData, means, yerr=stderrs, linewidth=0.0, capsize=5.0, color='#000000', capthick=2.0, elinewidth=2.0, marker='o', zorder=2)
-
-
 
     plt.grid()
     plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'normalised-conductance-all.png'))
