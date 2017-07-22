@@ -28,13 +28,21 @@ traceFilesByExperiment = ephysutils.findTraceFiles(searchRoot = args.path, \
      cellDetailsByCell = ephysutils.loadCellDetails(args.cellDetails))
 
 # Define time points for the analysis
-tBaselineStart  = 0.245  # Start estimating the baseline from here
-tBaselineLength = 0.01   # Estimate the baseline for this long
-tEnd            = 0.268  # End the graph
-tAnalyseFrom    = 0.2557 # Look for peaks after this time
-tAnalyseTo      = 0.263  # Look for peaks before this time
-tPersistentFrom = 0.300  # Start measuring mean persistent current
-tPersistentLength   = 0.015  # Measure mean persistent current for this long
+tBaselineStart    = 0.245  # Start estimating the baseline from here
+tBaselineLength   = 0.01   # Estimate the baseline for this long
+tAnalyseIVFrom    = 0.2597 # Look for IV peaks after this time
+tAnalyseIVTo      = 0.264  # Look for IV peaks before this time
+tAnalyseSSIFrom   = 0.509  # Draw SSI graph from here
+tAnalyseSSITo     = 0.516  # End the SSI graph
+tAnalyseSSIFrom   = 0.510  # Look for SSI peaks after this time
+tAnalyseSSITo     = 0.515  # Look for SSI peaks before this time
+
+tPlotIVFrom       = tBaselineStart + tBaselineLength
+tPlotIVTo         = 0.267
+
+tPlotSSIFrom      = 0.508
+tPlotSSITo        = 0.518
+
 
 # Open a results file with the date in the filename
 resultsDirectory = ephysutils.makeResultsDirectory(args.results)
@@ -55,21 +63,23 @@ pertracefile.write('\t'.join(['Path'
                              ,'Use peak or mean'
                              ,'Driving force for Na+ (mV)'
                              ,'Time to peak (s)'
-                             ,'I_min(pA)'
-                             ,'I_mean(pA)'
-                             ,'I_selected(pA)'
+                             ,'I_min_IV(pA)'
+                             ,'I_mean_IV(pA)'
+                             ,'I_selected_IV(pA)'
                              ,'WCC (pF)'
-                             ,'Peak current density(pA/pF)'
-                             ,'Mean current density(pA/pF)'
-                             ,'Selected current density(pA/pF)'
-                             ,'Peak conductance(pA/pF/mV)'
+                             ,'Peak current density IV(pA/pF)'
+                             ,'Mean current density IV(pA/pF)'
+                             ,'Selected current density IV(pA/pF)'
+                             ,'Conductance(pA/pF/mV)'
                              ,'Max conductance(pA/pF/mV)'
                              ,'Normalised conductance'
                              ,'Classification'
                              ,'Negative noise peak(pA)'
                              ,'Positive noise peak(pA)'
-                             ,'Mean persistent current(pA)'
-                             ,'Mean persistent current density (pA/pF)'
+                             ,'I_min_SSI(pA)'
+                             ,'I_mean_SSI(pA)'
+                             ,'I_selected_SSI(pA)'
+                             ,'Normalised selected current SSI'
                              ]) + '\n')
 
 percellfilename = os.path.join(resultsDirectory, 'results-per-cell.txt')
@@ -94,9 +104,9 @@ percellfile.write('\t'.join(['Path'
 # These traces were done at 50 kHz (see assertion below)
 sample_frequency = pq.Quantity(50000.0, 'Hz')
 sample_time_sec = (pq.Quantity(1.0, 'Hz') / sample_frequency).item()
-segment_count   = 23
+segment_count   = 16
 
-# Define colour map for traces 1..23 using 'winter' colour scale (green to blue)
+# Define colour map for traces 1..16 using 'winter' colour scale (green to blue)
 colormap = cm.ScalarMappable(norm=mpl.colors.Normalize(vmin=1, vmax=segment_count), cmap=cm.get_cmap('winter'))
 
 def selectTimeRange(signal, signalStartTime, selectionStartTime, selectionEndTime):
@@ -105,7 +115,7 @@ def selectTimeRange(signal, signalStartTime, selectionStartTime, selectionEndTim
   return signal[startIndex:endIndex]
 
 def voltageFromSegmentIndex(segmentIndex):
-  return pq.Quantity(5 * segmentIndex - 80, 'mV')
+  return pq.Quantity(10 * segmentIndex - 120, 'mV')
 
 def doNotProcess(cellDetails):
   return cellDetails['classification'] != 'SMALL' \
@@ -144,6 +154,9 @@ for experiment in traceFilesByExperiment:
       perCellRunningTotalRMSNoise = 0
 
       cellDetails['segments'] = []
+
+      first_segment_peak_current_SSI = None
+
       for segmentIndex in range(segment_count):
 
         thisSegmentData = {'segmentIndex': segmentIndex}
@@ -172,36 +185,56 @@ for experiment in traceFilesByExperiment:
         meanSquareNoise.units = 'pA**2'
         thisSegmentData['rmsNoise'] = sqrt(meanSquareNoise)
 
-        # Only take the signal from tStart to tEnd and take out the estimated baseline
-        thisSegmentData['traceToDraw']    = selectTimeRange(signal, 0, tBaselineStart + tBaselineLength, tPersistentFrom + tPersistentLength)
-        toAnalyse                         = selectTimeRange(signal, 0, tAnalyseFrom,                     tAnalyseTo)
+        thisSegmentData['traceToDraw_IV']    = selectTimeRange(signal, 0, tPlotIVFrom,  tPlotIVTo)
+        thisSegmentData['traceToDraw_SSI']   = selectTimeRange(signal, 0, tPlotSSIFrom, tPlotSSITo)
 
-        # Find the peak index (number of samples), current and time
-        minIndex   = argmin(toAnalyse)
-        thisSegmentData['peak_current'] = toAnalyse[minIndex]
-        thisSegmentData['time_to_peak'] = minIndex * sample_time_sec + tAnalyseFrom
-        thisSegmentData['peak_current_density'] = thisSegmentData['peak_current'] \
-                                                / cellDetails['whole_cell_capacitance']
-        thisSegmentData['persistent_current_density'] = thisSegmentData['mean_persistent_current'] \
-                                                / cellDetails['whole_cell_capacitance']
+        # Define region to analyse IV current
+        toAnalyseIV = selectTimeRange(signal, 0, tAnalyseIVFrom, tAnalyseIVTo)
+
+        # Find the peak and mean current and current density for the IV trace
+        minIndex   = argmin(toAnalyseIV)
+        thisSegmentData['peak_current_IV'] = toAnalyseIV[minIndex]
+        thisSegmentData['time_to_peak_IV'] = minIndex * sample_time_sec + tAnalyseIVFrom
+        thisSegmentData['peak_current_density_IV'] = thisSegmentData['peak_current_IV'] \
+                                                   / cellDetails['whole_cell_capacitance']
+
+        thisSegmentData['mean_current_IV']         = mean(toAnalyseIV)
+        thisSegmentData['mean_current_density_IV'] = thisSegmentData['mean_current_IV'] \
+                                                   / cellDetails['whole_cell_capacitance']
+
+        # Define region to analyse SSI current
+        toAnalyseSSI = selectTimeRange(signal, 0, tAnalyseSSIFrom, tAnalyseSSITo)
+
+        # Find the peak and mean current for the SSI trace
+        minIndex = argmin(toAnalyseSSI)
+        thisSegmentData['peak_current_SSI'] = toAnalyseSSI[minIndex]
+        thisSegmentData['mean_current_SSI'] = mean(toAnalyseSSI)
 
 
-        thisSegmentData['mean_current']         = mean(toAnalyse)
-        thisSegmentData['mean_current_density'] = thisSegmentData['mean_current'] \
-                                                / cellDetails['whole_cell_capacitance']
-
+        # Calculate things for the conductance curve
         thisSegmentData['voltage'] = voltageFromSegmentIndex(segmentIndex)
         thisSegmentData['driving_force'] = thisSegmentData['voltage'] - pq.Quantity(85.1, 'mV')
-        thisSegmentData['conductance']   = thisSegmentData['peak_current_density'] \
-                                         / thisSegmentData['driving_force']
+        thisSegmentData['conductance_IV'] = thisSegmentData['peak_current_density_IV'] \
+                                          / thisSegmentData['driving_force']
 
-        thisSegmentData['peak_or_mean'] = 'mean' if thisSegmentData['voltage'] <= cellDetails['activation_voltage'] else 'peak'
+        thisSegmentData['peak_or_mean_IV'] = 'mean' if thisSegmentData['voltage'] <= cellDetails['activation_voltage'] else 'peak'
 
-        thisSegmentData['selected_current']         = thisSegmentData[thisSegmentData['peak_or_mean'] + '_current']
-        thisSegmentData['selected_current_density'] = thisSegmentData[thisSegmentData['peak_or_mean'] + '_current_density']
+        thisSegmentData['selected_current_IV']         = thisSegmentData[thisSegmentData['peak_or_mean_IV'] + '_current_IV']
+        thisSegmentData['selected_current_density_IV'] = thisSegmentData[thisSegmentData['peak_or_mean_IV'] + '_current_density_IV']
 
-        if (thisSegmentData['peak_current'] < perCellMinPeakSoFar):
-          perCellMinPeakSoFar = thisSegmentData['peak_current']
+        # Choose whether to use peak or mean for SSI curve, depending on the inactivation voltage
+        thisSegmentData['peak_or_mean_SSI'] = 'peak' if thisSegmentData['voltage'] <= cellDetails['inactivation_voltage'] else 'mean'
+        thisSegmentData['selected_current_SSI']         = thisSegmentData[thisSegmentData['peak_or_mean_SSI'] + '_current_SSI']
+
+        # Define first_segment_peak_current_SSI
+        if first_segment_peak_current_SSI is None:
+          first_segment_peak_current_SSI = thisSegmentData['peak_current_SSI']
+
+        # Calculate normalised SSI current
+        thisSegmentData['normalised_current_SSI']       = thisSegmentData['selected_current_SSI']/first_segment_peak_current_SSI
+
+        if (thisSegmentData['peak_current_IV'] < perCellMinPeakSoFar):
+          perCellMinPeakSoFar = thisSegmentData['peak_current_IV']
 
         if (perCellMaxConductanceSoFar < thisSegmentData['conductance']):
           perCellMaxConductanceSoFar = thisSegmentData['conductance']
@@ -209,7 +242,7 @@ for experiment in traceFilesByExperiment:
         perCellRunningTotalP2PNoise += thisSegmentData['peakNoisePos'].item() - thisSegmentData['peakNoiseNeg'].item()
         perCellRunningTotalRMSNoise += thisSegmentData['rmsNoise']
 
-      cellDetails['min_peak_current'] = perCellMinPeakSoFar
+      cellDetails['min_peak_current_IV'] = perCellMinPeakSoFar
       cellDetails['max_conductance']  = perCellMaxConductanceSoFar
       cellDetails['mean_p2p_noise']   = perCellRunningTotalP2PNoise / segment_count
       cellDetails['mean_rms_noise']   = perCellRunningTotalRMSNoise / segment_count
@@ -227,7 +260,7 @@ for experiment in traceFilesByExperiment:
                                   ,cellDetails['cell_identity']
                                   ,cellDetails['when']
                                   ,str(cellDetails['whole_cell_capacitance'].item())
-                                  ,str(cellDetails['min_peak_current'].item())
+                                  ,str(cellDetails['min_peak_current_IV'].item())
                                   ,str(cellDetails['mean_rms_noise'])
                                   ,str(cellDetails['mean_p2p_noise'])
                                   ,str(cellDetails['max_conductance'].item())
@@ -246,22 +279,26 @@ for experiment in traceFilesByExperiment:
                                      ,cellDetails['when']
                                      ,str(thisSegmentData['segmentIndex'])
                                      ,str(thisSegmentData['voltage'].item())
-                                     ,thisSegmentData['peak_or_mean']
+                                     ,thisSegmentData['peak_or_mean_IV']
                                      ,str(thisSegmentData['driving_force'].item())
                                      ,str(thisSegmentData['time_to_peak'].item())
-                                     ,str(thisSegmentData['peak_current'].item())
-                                     ,str(thisSegmentData['mean_current'].item())
-                                     ,str(thisSegmentData['selected_current'].item())
+                                     ,str(thisSegmentData['peak_current_IV'].item())
+                                     ,str(thisSegmentData['mean_current_IV'].item())
+                                     ,str(thisSegmentData['selected_current_IV'].item())
                                      ,str(cellDetails['whole_cell_capacitance'].item())
-                                     ,str(thisSegmentData['peak_current_density'].item())
-                                     ,str(thisSegmentData['mean_current_density'].item())
-                                     ,str(thisSegmentData['selected_current_density'].item())
+                                     ,str(thisSegmentData['peak_current_density_IV'].item())
+                                     ,str(thisSegmentData['mean_current_density_IV'].item())
+                                     ,str(thisSegmentData['selected_current_density_IV'].item())
                                      ,str(thisSegmentData['conductance'].item())
                                      ,str(cellDetails['max_conductance'].item())
                                      ,str(thisSegmentData['normalised_conductance'].item())
                                      ,cellDetails['classification']
                                      ,str(thisSegmentData['peakNoiseNeg'].item())
                                      ,str(thisSegmentData['peakNoisePos'].item())
+                                     ,str(thisSegmentData['peak_current_SSI'].item())
+                                     ,str(thisSegmentData['mean_current_SSI'].item())
+                                     ,str(thisSegmentData['selected_current_SSI'].item())
+                                     ,str(thisSegmentData['normalised_current_SSI'].item())
                                      ]) + '\n')
 
       # Draw the traces for this cell
@@ -280,8 +317,8 @@ for experiment in traceFilesByExperiment:
                         thisSegmentData['traceToDraw'], linewidth=0.5, alpha=0.5)
         plt.setp(line, color=thisSegmentColor)
 
-        if thisSegmentData['peak_or_mean'] == 'peak':
-          mark = plt.plot(thisSegmentData['time_to_peak'], thisSegmentData['peak_current'], '+')
+        if thisSegmentData['peak_or_mean_IV'] == 'peak':
+          mark = plt.plot(thisSegmentData['time_to_peak'], thisSegmentData['peak_current_IV'], '+')
           plt.setp(mark, color=thisSegmentColor)
 
       plt.axvspan(tAnalyseFrom, tAnalyseTo, facecolor='#c0c0c0', alpha=0.5)
@@ -299,7 +336,7 @@ for experiment in traceFilesByExperiment:
       yData = []
       for thisSegmentData in cellDetails['segments']:
         xData.append(thisSegmentData['voltage'])
-        yData.append(thisSegmentData['peak_current_density'])
+        yData.append(thisSegmentData['peak_current_density_IV'])
 
       line = plt.plot(xData, yData, linewidth=0.5, zorder=0)
       plt.setp(line, color='#ff0000')
@@ -308,7 +345,7 @@ for experiment in traceFilesByExperiment:
       yData = []
       for thisSegmentData in cellDetails['segments']:
         xData.append(thisSegmentData['voltage'])
-        yData.append(thisSegmentData['mean_current_density'])
+        yData.append(thisSegmentData['mean_current_density_IV'])
 
       line = plt.plot(xData, yData, linewidth=0.5, zorder=0)
       plt.setp(line, color='#00ff00')
@@ -318,13 +355,32 @@ for experiment in traceFilesByExperiment:
       yData = []
       for thisSegmentData in cellDetails['segments']:
         xData.append(thisSegmentData['voltage'])
-        yData.append(thisSegmentData['selected_current_density'])
+        yData.append(thisSegmentData['selected_current_density_IV'])
 
       line = plt.plot(xData, yData, linewidth=1, zorder=1)
       plt.setp(line, color='#000000')
 
       plt.grid()
       plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'current-density-' + cellDetails['filename'] + '.png'))
+      plt.close()
+
+      # Draw the SSI curve for this cell
+      figure = plt.figure(figsize=(20,10), dpi=80)
+      plt.title(sampleName)
+      plt.xlabel('Voltage (mV)')
+      plt.ylabel('Normalised Current')
+
+      xData = []
+      yData = []
+      for thisSegmentData in cellDetails['segments']:
+        xData.append(thisSegmentData['voltage'])
+        yData.append(thisSegmentData['normalised_current_SSI'])
+
+      line = plt.plot(xData, yData, linewidth=0.5, zorder=0)
+      plt.setp(line, color='#ff0000')
+
+      plt.grid()
+      plt.savefig(os.path.join(resultsDirectory, experiment, condition, 'inactivation-' + cellDetails['filename'] + '.png'))
       plt.close()
 
       # Draw the activation curve for this cell
@@ -366,7 +422,7 @@ for experiment in traceFilesByExperiment:
       yData = []
       for thisSegmentData in cellDetails['segments']:
         xData.append(thisSegmentData['voltage'])
-        yData.append(thisSegmentData['peak_current_density'])
+        yData.append(thisSegmentData['peak_current_density_IV'])
 
       line = plt.plot(xData, yData, zorder=1)
       plt.setp(line, color='#c0c0c0')
@@ -410,7 +466,7 @@ for experiment in traceFilesByExperiment:
       yData = []
       for thisSegmentData in cellDetails['segments']:
         xData.append(thisSegmentData['voltage'])
-        yData.append(thisSegmentData['selected_current_density'])
+        yData.append(thisSegmentData['selected_current_density_IV'])
 
       line = plt.plot(xData, yData, zorder=1)
       plt.setp(line, color='#c0c0c0')
