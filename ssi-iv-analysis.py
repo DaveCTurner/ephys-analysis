@@ -199,7 +199,8 @@ for experiment in traceFilesByExperiment:
         thisSegmentData['conductance']   = thisSegmentData['peak_current_density'] \
                                          / thisSegmentData['driving_force']
 
-        thisSegmentData['peak_or_mean'] = 'mean' if thisSegmentData['voltage'] <= conditionActivationVoltage else 'peak'
+        thisSegmentData['peak_or_mean'] = 'mean' if thisSegmentData['voltage'] <= cellDetails['activation_voltage'] else 'peak'
+
         thisSegmentData['selected_current']         = thisSegmentData[thisSegmentData['peak_or_mean'] + '_current']
         thisSegmentData['selected_current_density'] = thisSegmentData[thisSegmentData['peak_or_mean'] + '_current_density']
 
